@@ -5,6 +5,7 @@ const server = require("http").Server(app);
 const io = require("socket.io")(server);
 const { v4: uuidv4 } = require("uuid");
 const { ExpressPeerServer } = require("peer");
+// const { Console } = require("console");
 
 // settings
 app.set("view engine", "ejs");
@@ -13,7 +14,7 @@ const peerServer = ExpressPeerServer(server, {
   debug: true,
 });
 app.use('/peerjs', peerServer);
-
+//
 // root route for creating rooms.
 app.get("/", (req, res) => {
   res.redirect(`/${uuidv4()}`);
@@ -33,7 +34,13 @@ io.on("connection", (socket) => {
     console.log(`${userId} has joined this room ` + roomId);
     // telling all others that a new user has joined
     socket.to(roomId).broadcast.emit("user-connected", userId);
+
+    socket.on('message', message => {
+      io.to(roomId).emit('createMessage', message);
+    });
   });
 });
+
+console.log("Running...");
 
 server.listen(3030);
