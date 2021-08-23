@@ -43,4 +43,4 @@ io.on("connection", (socket) => {
 
 console.log("Running...");
 
-server.listen(3030);
+server.listen(process.env.PORT||3030);
