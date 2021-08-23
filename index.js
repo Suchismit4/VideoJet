@@ -19,7 +19,6 @@ app.get("/", (req, res) => {
   res.redirect(`/${uuidv4()}`);
 });
 
-
 // getting the uuid room route
 app.get("/:room", (req, res) => {
   res.render("room", { roomId: req.params.room });
@@ -31,8 +30,9 @@ io.on("connection", (socket) => {
   socket.on("join-room", (roomId, userId) => {
     // joining with roomId from front-end (creating a socket room)
     socket.join(roomId);
+    console.log(`${userId} has joined this room ` + roomId);
     // telling all others that a new user has joined
-    socket.to(roomId).emit("user-connected", userId);
+    socket.to(roomId).broadcast.emit("user-connected", userId);
   });
 });
 
