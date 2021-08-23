@@ -1,7 +1,5 @@
 const socket = io("/");
-
 const videoGrid = document.getElementById("video-grid");
-
 const myVideo = document.createElement("video");
 myVideo.muted = true;
 
@@ -15,19 +13,19 @@ var peer = new Peer(undefined, {
 let videoStream; // global stream
 
 // getting the available media from the browser
-navigator.mediaDevices
-  .getUserMedia({
+navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true,
   })
   .then((stream) => {
     // making the stream global to access it everywhere
     videoStream = stream;
+    addVideoStream(myVideo, stream);
 
     // answering a peer call
     peer.on("call", (call) => {
+      call.answer(stream);
       console.log("answered");
-      call.answer(videoStream);
       const video = document.createElement("video");
       call.on("stream", (userVideoStream) => {
         addVideoStream(video, userVideoStream);
@@ -38,7 +36,6 @@ navigator.mediaDevices
     socket.on("user-connected", (userId) => {
       setTimeout(connecToNewUser,3000,userId,stream);
     });
-    addVideoStream(myVideo, stream);
   });
 
 // playing a video stream
@@ -65,3 +62,21 @@ const connecToNewUser = (userId, stream) => {
     addVideoStream(video, userVideoStream);
   });
 };
+
+let msg = $('input');
+
+$('html').keydown((e) => {
+  if(e.which == 13 && msg.val().length !== 0) {
+    console.log(msg.val());
+    socket.emit('message', msg.val());
+    msg.val('');
+  }
+});
+
+socket.on('createMessage', message => {
+  console.log('This is coming from server', message);
+})
+
+// $(window).on('beforeunload', function(){
+//   socket.close();
+// });
