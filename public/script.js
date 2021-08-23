@@ -23,7 +23,6 @@ navigator.mediaDevices
   .then((stream) => {
     // making the stream global to access it everywhere
     videoStream = stream;
-    addVideoStream(myVideo, stream);
 
     // answering a peer call
     peer.on("call", (call) => {
@@ -37,8 +36,9 @@ navigator.mediaDevices
 
     // listening to a new user connection
     socket.on("user-connected", (userId) => {
-      connecToNewUser(userId, stream);
+      setTimeout(connecToNewUser,3000,userId,stream);
     });
+    addVideoStream(myVideo, stream);
   });
 
 // playing a video stream
