@@ -43,7 +43,6 @@ navigator.mediaDevices.getUserMedia({
     // listening to a new user connection
     socket.on("user-connected", (userId) => {
       setTimeout(connectToNewUser,3000,userId,stream);
-      console.log("New user joined the room with id "+userId);
     });
 
     let msg = $('input');
@@ -88,6 +87,7 @@ const connectToNewUser = (userId, stream) => {
   console.log("call made");
   const video = document.createElement("video");
   video.setAttribute('id', userId);
+  console.log("New user joined the room with id " + userId);
   call.on("stream", (userVideoStream) => {
     addVideoStream(video, userVideoStream);
   });
