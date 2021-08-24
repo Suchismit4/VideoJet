@@ -10,10 +10,7 @@ var peer = new Peer(undefined, {
   port: "443",
 });
 
-peer.on("open", (id) => {
-  // broadcasting to all available server (to the server port and http already config)
-  socket.emit("join-room", ROOM_ID, id);
-});
+
 
 let videoStream; // global stream
 
@@ -24,6 +21,12 @@ navigator.mediaDevices.getUserMedia({
   })
   .then((stream) => {
     // making the stream global to access it everywhere
+
+    peer.on("open", (id) => {
+      // broadcasting to all available server (to the server port and http already config)
+      socket.emit("join-room", ROOM_ID, id);
+    });
+    
     videoStream = stream;
     myVideo.setAttribute('id', peer.id);
     addVideoStream(myVideo, stream);
@@ -62,7 +65,7 @@ navigator.mediaDevices.getUserMedia({
     });
 
     socket.on('userDisconnected', userId => {
-      setTimeout(removeVideoStream, 3000, userId);
+      removeVideoStream(userId);
     })
   });
 
