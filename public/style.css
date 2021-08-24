@@ -11,6 +11,7 @@ video{
 
 body{
     margin: 0;
+    overflow: hidden;
 }
 
 .main{
@@ -20,6 +21,7 @@ body{
 
 .main__left{
     flex: 0.8;
+    max-width: 80vw;
     display: flex;
     flex-direction: column;
 }
