@@ -133,3 +133,9 @@ body{
     font-size: 10px;
     margin-left: 5px;
 }
+
+#video-grid{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
