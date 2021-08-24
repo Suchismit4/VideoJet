@@ -26,11 +26,11 @@ app.get("/:room", (req, res) => {
 });
 
 // when a new user connects to our network
-io.on("connection", (socket) => {
+io.on("connection", socket => {
   // when the event 'join-room' is triggered we are to listen to it.
   socket.on("join-room", (roomId, userId) => {
     // joining with roomId from front-end (creating a socket room)
-    socket.join(roomId);
+    socket.join(roomId)
     console.log(`${userId} has joined this room ` + roomId);
     // telling all others that a new user has joined
     socket.to(roomId).broadcast.emit("user-connected", userId);
@@ -38,7 +38,13 @@ io.on("connection", (socket) => {
     socket.on('message', message => {
       io.to(roomId).emit('createMessage', message);
     });
+
+    socket.on("disconnect", reason => {
+      io.to(roomId).emit("userDisconnected", userId);
+    });
+
   });
+
 });
 
 console.log("Running...");
