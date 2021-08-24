@@ -62,7 +62,7 @@ navigator.mediaDevices.getUserMedia({
     });
 
     socket.on('userDisconnected', userId => {
-      removeVideoStream(userId);
+      setTimeout(removeVideoStream, 3000, userId);
     })
   });
 
