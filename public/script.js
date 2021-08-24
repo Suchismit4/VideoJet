@@ -26,7 +26,7 @@ navigator.mediaDevices.getUserMedia({
       // broadcasting to all available server (to the server port and http already config)
       socket.emit("join-room", ROOM_ID, id);
     });
-    
+
     videoStream = stream;
     myVideo.setAttribute('id', peer.id);
     addVideoStream(myVideo, stream);
