@@ -7,7 +7,7 @@ myVideo.muted = true;
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "443",
+  port: "3030",
 });
 
 let videoStream; // global stream
@@ -36,6 +36,23 @@ navigator.mediaDevices.getUserMedia({
     socket.on("user-connected", (userId) => {
       setTimeout(connecToNewUser,3000,userId,stream);
     });
+
+    let msg = $('input');
+
+    $('html').keydown((e) => {
+      if(e.which == 13 && msg.val().length !== 0) {
+        socket.emit('message', msg.val());
+        msg.val('');
+      }
+    });
+
+    socket.on('createMessage', message => {
+      let today = new Date();
+      let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      $('.messages').append(`<li class='message'><b>User </b><span class='time'>${time}</span><br/>${message}</li>`)
+      scrollToBottom();
+    });
+
   });
 
 // playing a video stream
@@ -63,19 +80,11 @@ const connecToNewUser = (userId, stream) => {
   });
 };
 
-let msg = $('input');
+const scrollToBottom = () => {
+  let chat = $(".main__chat__window");
+  chat.scrollTop(chat.prop("scrollHeight"))
+}
 
-$('html').keydown((e) => {
-  if(e.which == 13 && msg.val().length !== 0) {
-    console.log(msg.val());
-    socket.emit('message', msg.val());
-    msg.val('');
-  }
-});
-
-socket.on('createMessage', message => {
-  console.log('This is coming from server', message);
-})
 
 // $(window).on('beforeunload', function(){
 //   socket.close();
