@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Clone | Made by Aten & Ribu</title>
+    <script src="https://kit.fontawesome.com/1d62c0dc9b.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="/main/style.css">
+    <script>
+        LOGIN_STATE = <%= isLogin %>;
+        ERR_STATE = <%= err %>;
+        MEETINGS_PENDING = "<%= meetings %>";
+        if (ERR_STATE == 69420) {
+            alert("Login failed, Try again.")
+        }
+
+        if (MEETINGS_PENDING.length > 0) {
+            setTimeout(function () {
+                window.location = (`/${MEETINGS_PENDING}`)
+            }, 5000);
+        }
+
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div>
+                    <img id="logo" src="/img/logo.png" alt="">
+                </div>
+            </div>
+        </div>
+    </header>
+    <% if(!isLogin){ %>
+        <div id="login-area">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <form action="/login-check" method="POST">
+                        <div class="row">
+                            <p id="tag-form">Join your meeting...</p>
+                        </div>
+                        <div class="row">
+                            <input type="email" placeholder="Your registered email address" name="email" id="email">
+                        </div>
+                        <div class="row">
+                            <input type="password" placeholder="Your password" name="password" id="password">
+                        </div>
+                        <div class="row">
+                            <button type="submit">Go &nbsp;<i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <% }else{ %>
+            <% if(meetings.length> 0){ %>
+                <div class="container">
+                    <div class="row justify-content-center text-center">
+                        <div style="margin-top: 150px;">
+                            <div class="loading-wrapper rotate">
+                                <div class="circle blue"></div>
+                                <div class="gap-patch"></div>
+                            </div>
+                        </div>
+                        <h3>Joining </h3>
+                    </div>
+                </div>
+                <% }else{ %>
+                    <div class="container">
+                        <div class="row justify-content-center text-center">
+                            <h3>No meetings pending</h3>
+
+                        </div>
+                    </div>
+                    <% } %>
+                        <% } %>
+</body>
+<script src="/main/main.js"></script>
+
+</html>
