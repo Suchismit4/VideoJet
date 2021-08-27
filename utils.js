@@ -10,6 +10,10 @@ let users = [
     {
         email: 'suchismit4@gmail.com',
         password: 'abcd1234'
+    },
+    {
+        email: 'manka1234@gmail.com',
+        password: 'mankaOP'
     }
 ];
 
