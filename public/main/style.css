@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+body, html{
+    background-color: #000;
+}
+
+*{
+    font-family: 'Montserrat' sans-serif;
+}
+
+header{
+    padding: 40px;
+}
+
+img#logo{
+    width: 170px;
+}
+
+::selection{
+    background-color: none;
+}
+
+form{
+    margin-top: 100px !important;
+    width: 420px !important;
+}
+
+form input{
+    padding: 13px 16px !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+    width: 420px !important;
+    margin-bottom: 20px !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: #333;
+}
+
+ #tag-form{
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Montserrat', sans-serif;
+    color: #ecf0f1;
+    font-weight: 900;
+    margin-bottom: 9px;
+    font-size: 20px;
+}
+
+ form button{
+    background-color: #2d8cff;
+    border: none;
+    box-shadow: none;
+    padding: 9px 15px;
+    border-radius: 3px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: #ecf0f1;
+    margin-top: 15px;
+}
+
+.loading-wrapper{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    position:relative;
+    display: inline-block;
+    overflow:hidden;
+    margin: 10px;
+}
+.rotate{
+     -webkit-animation: rotate 1s linear infinite;
+}
+.circle{
+    width:100%;
+    height:100%;
+    display:block;
+    -webkit-animation: grow 1.5s ease-in-out infinite;
+}
+
+.blue{
+    background-color: #2d8cff;
+}
+
+.gap-patch{
+    position:absolute;
+    margin:auto;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:90%;
+    height:90%;
+    border-radius:50%;
+    background-color:#000;
+    color:black;
+}
+@-webkit-keyframes grow{
+    0%{
+        width:8%;
+    }
+    45%{
+        width: 90%;
+    }
+    55%{
+        width: 90%;
+    }
+    95%{
+        width:8%;
+    }
+    100%{
+        width:8%;
+    }
+}
+@-webkit-keyframes rotate{
+    0%{
+         transform: rotateZ(0deg);
+    }
+    100%{
+         transform: rotateZ(360deg);
+    }
+}
+
+h3{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    padding-top: 25px;
+    color: #fff;
+}
