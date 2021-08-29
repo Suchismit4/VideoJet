@@ -100,6 +100,16 @@ const scrollToBottom = () => {
   chat.scrollTop(chat.prop("scrollHeight"))
 }
 
+const toggleMute = () => {
+  const enabled = videoStream.getAudioTracks()[0].enabled;
+  if (enabled) {
+    videoStream.getAudioTracks()[0].enabled = false;
+    document.querySelector('.mute__button').innerHTML = `<i class="fas fa-microphone-slash"></i><span>Unmute</span>`;
+  } else {
+    videoStream.getAudioTracks()[0].enabled = true;
+    document.querySelector('.mute__button').innerHTML = `<i class="fas fa-microphone"></i><span>Mute</span>`;
+  }
+}
 
 // $(window).on('beforeunload', function(){
 //   socket.close();

@@ -140,4 +140,10 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+video{
+    flex-grow: 1;
+    margin: 2.5px;
 }
