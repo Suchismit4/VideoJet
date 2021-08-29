@@ -7,8 +7,9 @@ myVideo.muted = true;
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "3030",
+  port: "443",
 });
+
 
 peer.on("open", (id) => {
   // broadcasting to all available server (to the server port and http already config)
@@ -24,6 +25,7 @@ navigator.mediaDevices.getUserMedia({
   })
   .then((stream) => {
     // making the stream global to access it everywhere
+
     videoStream = stream;
     myVideo.setAttribute('id', peer.id);
     addVideoStream(myVideo, stream);
@@ -43,7 +45,6 @@ navigator.mediaDevices.getUserMedia({
     // listening to a new user connection
     socket.on("user-connected", (userId) => {
       setTimeout(connectToNewUser,3000,userId,stream);
-      console.log("New user joined the room with id "+userId);
     });
 
     let msg = $('input');
@@ -88,6 +89,7 @@ const connectToNewUser = (userId, stream) => {
   console.log("call made");
   const video = document.createElement("video");
   video.setAttribute('id', userId);
+  console.log("New user joined the room with id " + userId);
   call.on("stream", (userVideoStream) => {
     addVideoStream(video, userVideoStream);
   });
