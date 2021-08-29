@@ -1,14 +1,35 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 // imports
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
+const fs = require('fs');
 const { v4: uuidv4 } = require("uuid");
 const utils = require('./utils.js')
 const { ExpressPeerServer } = require("peer");
 const e = require("express");
 // const { Console } = require("console");
+
+// importing essentials for login system 
+const bcrypt = require('bcrypt');
+const passport = require('passport')
+const flash = require('express-flash')
+const session = require('express-session') // joks session
+const {
+  promisify
+} = require('util')
+const writeFile = promisify(fs.writeFile)
+const readFile = promisify(fs.readFile)
+const initializePassport = require('./passport-config.js');
+initializePassport(
+  passport,
+  email => users.find(user => user.email === email),
+  id => users.find(user => user.id === id)
+);
 
 // settings
 app.set("view engine", "ejs");
@@ -20,58 +41,112 @@ app.use(express.static("public"));
 const peerServer = ExpressPeerServer(server, {
   debug: true,
 });
+app.use(express.urlencoded({
+  extended: false
+}))
+
+app.use(flash())
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(express.json());
 app.use('/peerjs', peerServer);
 
-let pending_meeting = [];
+let pending_meetings = [];
+var users = [];
 
-let loggedInUsers = [
-  'admin@zoombutclone.com'
-];
-
-// root route for creating rooms.
-app.get("/", (req, res) => {
-  res.render("index", { isLogin: false, err: 100, meetings: pending_meeting[0], email: null })
+// root route for login
+app.get("/", CheckNotAuth, (req, res) => {
+  res.render("index", { isLogin: false, err: 100 })
 });
 
-// posted signal for logging in 
-app.post('/login-check', async (req, res) => {
-  const status = await utils.manager.CheckLogin(req);
-  if (status) {
-    loggedInUsers.push(req.body.email)
-    res.render("index", { isLogin: true, err: 100, meetings: pending_meeting, email: req.body.email })
-  } else {
-    res.render('index',  { isLogin: false, err: 69420, meetings: pending_meeting, email: null});
+// dashboard 
+app.get('/dashboard', CheckAuth, (req, res) => {
+  res.render('dashboard', {user: req.user, loggedIn: true, err: 100, meetings: pending_meetings})
+})
+
+app.post('/user/login', CheckNotAuth, passport.authenticate('local', {
+  successRedirect: '/dashboard',
+  failureRedirect: '/',
+  failureFlash: true
+}));
+
+// get request to handle displaying register
+app.get('/admin/register', CheckNotAuth, (req, res) => {
+  // if (req.user.type != "admin") return res.redirect('/');
+  res.render('register');
+});
+
+// post signal for login
+app.post('/admin/register/server', CheckNotAuth, async (req, res) => {
+  try {
+    // if (req.user.type != "admin") return res.redirect('/');
+    const email = req.body.email;
+    const password = req.body.password;
+    const _hashedPassword = await bcrypt.hash(password, 10);
+    const id = Date.now().toString();
+    users.push({
+      id: id,
+      email: email,
+      password: _hashedPassword,
+      f_name: req.body.f_name,
+      l_name: req.body.l_name,
+      type: "admin",
+    })
+    res.redirect('/');
+    const TryUpload = async () => {
+      const data = await readFile('./db/users_secure.json', 'utf-8');
+      obj = JSON.parse(data);
+      var _users = obj.users;
+      _users.push({
+        id: id,
+        email: email,
+        password: _hashedPassword,
+        f_name: req.body.f_name,
+        l_name: req.body.l_name,
+        type: "admin",
+      });
+      json = JSON.stringify(obj, 2, null);
+      await writeFile('./db/users_secure.json', json, 'utf-8');
+    }
+    TryUpload();
+  } catch {
+    res.redirect('/admin/register?state=false&err=001');
   }
 });
 
-// create a meeting
-app.get('/admin/create', (req, res) => {
-  if(pending_meeting.length >= 1){
-    console.log("trigg")
-    res.render('create.ejs', {createMeeting: false, login: false, err: 69,})
-  }else{
-    res.render('create.ejs', {createMeeting: false, login: false, err: 100})
+/* ----------------------------------
+*         Deprecated [OLD]
+*
+*  Seperate page to create a meeting
+*
+
+app.get('/admin/create', CheckAuth, (req, res) => {
+  if (req.user.type != "auth") return res.redirect('/');
+  if (pending_meeting.length >= 1) {
+    res.render('create.ejs', { createMeeting: false, login: false, err: 500, })
+  } else {
+    res.render('create.ejs', { createMeeting: false, login: false, err: 100 })
   }
 })
 
+*  ----------------------------------
+*/
+
 // create a meeting
-app.post('/create/meeting/', (req, res) => {
-  if(utils.manager.CheckAdmin(req.body)){
-    const meeting_key = uuidv4();
-    pending_meeting.push(meeting_key);
-    res.redirect(`/${meeting_key}/admin@zoombutclone.com`);
-  }else{
-    res.render('create.ejs', {createMeeting: false, login: false, err: 69420})
-  }
+app.post('/create/meeting/', CheckAuth, (req, res) => {
+  const meeting_key = uuidv4();
+  pending_meetings.push(meeting_key);
+  res.send(`${meeting_key}`);
 })
 
 // getting the uuid room route
-app.get("/:room/:loginEmail", (req, res) => {
-  if(loggedInUsers.includes(req.params.loginEmail)){
-    res.render("room", { roomId: req.params.room });
-  }else{
-    res.redirect('/')
-  }
+app.get("/meeting/:room", CheckAuth ,(req, res) => {
+  res.render("room", { roomId: req.params.room });
 });
 
 // when a new user connects to our network
@@ -92,7 +167,7 @@ io.on("connection", socket => {
       io.to(roomId).emit("userDisconnected", userId);
       const clients = io.sockets.adapter.rooms[`${roomId}`];
       const numClients = clients ? clients.size : 0;
-      if(numClients <= 0){
+      if (numClients <= 0) {
         pending_meeting.length = 0;
       }
     });
@@ -102,5 +177,37 @@ io.on("connection", socket => {
 });
 
 console.log("Running...");
+
+// Authentication Middleware functions
+
+function CheckAuth(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    res.redirect('/');
+  }
+}
+
+function CheckNotAuth(req, res, next) {
+  if (req.isAuthenticated()) {
+    return res.redirect('/dashboard');
+  }
+  next();
+}
+
+async function LoadUsers() {
+  const data = await readFile('./db/users_secure.json', 'utf-8');
+  obj = JSON.parse(data);
+  if (!obj) return;
+  for (var i = 0; i < obj.users.length; i++) {
+    users.push(obj.users[i]);
+  }
+}
+
+const UpdateUsers = setInterval(async function () {
+  const data = await readFile('./db/users_secure.json', 'utf-8');
+  obj = JSON.parse(data);
+  users = obj.users;
+}, 25000);
 
 server.listen(process.env.PORT || 3030);

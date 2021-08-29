@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Clone | Made by Aten & Ribu</title>
+    <script src="https://kit.fontawesome.com/1d62c0dc9b.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/main/style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div>
+                    <img id="logo" src="/img/logo.png" alt="">
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row justify-content-center">
+            <form style="margin-top: 30px !important;">
+                <div class="row">
+                    <input type="text" placeholder="Meeting universally unique identifier" name="meeting_id"
+                        id="meeting_id">
+                </div>
+                <div class="row">
+                    <input type="password" placeholder="Your password (leave empty if none)" name="meeting_password"
+                        id="meeting_password">
+                </div>
+                <div class="row">
+                    <button>Join &nbsp;<i class="fas fa-arrow-right"></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="row justify-content-center text-center">
+            <hr id="seperator">
+        </div>
+        <div class="row justify-content-center">
+            <button onclick="ShowCreate()" style="margin-bottom: 30px;">Create a meeting <i class="fas fa-sort-down"
+                    id="down-icon"></i></button>
+        </div>
+        <div id="creation_of_meetings" class="row justify-content-center d-none">
+            <div style="width: 420px;">
+                <div class="row">
+                    <input type="text" placeholder="Meeting Topic" name="topic" id="cr_meeting_topic"
+                        style="width: 205px !important; margin-right: 5px !important;">
+                    <input type="text" placeholder="Meeting Type (Education/General)" name="type" id="cr_meeting_type"
+                        style="width: 205px !important; margin-left: 5px !important;">
+                </div>
+                <div class="row">
+                    <textarea type="text" placeholder="Meeting description" id="cr_meeting_desc"></textarea>
+                </div>
+                <div class="row">
+                    <input type="password" placeholder="Meeting password (leave empty if none)" name="password"
+                        id="meeting_password">
+                </div>
+                <div class="row">
+                    <button style="margin-bottom: 50px;" onclick="CreateAMeeting()">Create
+                        now &nbsp;<i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="modal-after-create" tabindex="-1" aria-labelledby="modal-after-createLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-after-createLabel"> <img style="width: 25px;" src="https://c.tenor.com/0AVbKGY_MxMAAAAM/check-mark-verified.gif" alt="">&nbsp; New meeting created</h5>
+                </div>
+                <div class="modal-body">
+                    <h2 class="meeting_info_header">Meeting topic: <b> <span id="meeting_topic_modal"></span></b></h2>
+                    <h2 class="meeting_info_header">Meeting type: <b><span id="meeting_type_modal"></span></b></h2>
+                    <h2 class="meeting_info_header">Meeting password:&nbsp; <span id="meeting_password_modal" class="pwd">726db352x</span></h2>
+                    <br>
+                    <h2 style="font-size: 18px; font-weight: 600;font-family: 'Montserrat', sans-serif;"><i class="fas fa-share"></i> Share this meeting&nbsp; <span class="copy">Copy</span> </h2>  
+                    <div class="share">
+                        <p><b><%= user.f_name %></b> invites you to a Zoom, but clone meeting.</p>
+                        <br>
+                        <p><b>Meeting Topic</b>: <span id="meeting_topic_share"></span> </p>
+                        <p><b>Meeting Type</b>: <span id="meeting_type_share"></span></p>
+                        <p><b>Meeting description</b>: <span id="meeting_description_share"></span></p>
+                        <br>
+                        <p><b>Join using this link</b>: https://zooom-clone.atendimento205.repl.co/<span id="meeting_link_share"></span></p>
+                        <p><b>Password</b>: <span id="meeting_pwd_share"></span></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button style="width: 100% !important;" onclick="" id="start-meeting" type="button">Start Meeting</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="/main/main.js"></script>
+
+</html>
