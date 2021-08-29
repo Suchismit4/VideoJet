@@ -30,7 +30,7 @@
     </header>
     <div class="container">
         <div class="row justify-content-center">
-            <form style="margin-top: 30px !important;">
+            <div style="margin-top: 30px; width: 420px;">
                 <div class="row">
                     <input type="text" placeholder="Meeting universally unique identifier" name="meeting_id"
                         id="meeting_id">
@@ -40,9 +40,9 @@
                         id="meeting_password">
                 </div>
                 <div class="row">
-                    <button>Join &nbsp;<i class="fas fa-arrow-right"></i></button>
+                    <button onclick="JoinMeeting()">Join &nbsp;<i class="fas fa-arrow-right"></i></button>
                 </div>
-            </form>
+            </div>
         </div>
         <div class="row justify-content-center text-center">
             <hr id="seperator">
@@ -97,12 +97,12 @@
                         <p><b>Meeting Type</b>: <span id="meeting_type_share"></span></p>
                         <p><b>Meeting description</b>: <span id="meeting_description_share"></span></p>
                         <br>
-                        <p><b>Join using this link</b>: https://zooom-clone.atendimento205.repl.co/<span id="meeting_link_share"></span></p>
-                        <p><b>Password</b>: <span id="meeting_pwd_share"></span></p>
+                        <p><b>Join using this link</b>: https://zooom-clone.atendimento205.repl.co/meeting/<span id="meeting_link_share"></span></p>
+                        <p><b>Password</b>: <span id="meeting_password_share"></span></p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button style="width: 100% !important;" onclick="" id="start-meeting" type="button">Start Meeting</button>
+                    <button style="width: 100% !important;"  id="start-meeting" type="button">Start Meeting</button>
                 </div>
             </div>
         </div>
