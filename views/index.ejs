@@ -17,10 +17,10 @@
         if (ERR_STATE == 69420) {
             alert("Login failed, Try again.")
         }
-
+        MY_EMAIL = '<%= email %>';
         if (MEETINGS_PENDING.length > 0 && LOGIN_STATE) {
             setTimeout(function () {
-                window.location = (`/${MEETINGS_PENDING}`)
+                window.location = (`/${MEETINGS_PENDING}/${MY_EMAIL}`)
             }, 5000);
         }
 

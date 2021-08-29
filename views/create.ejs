@@ -13,8 +13,12 @@
     <script>
         const LOGIN_STATE = <%= login %>;
         const ERR = <%= err %>;
+        console.log(ERR);
         if(ERR === 69420){
             alert("Nice try bitch");
+            setTimeout(function(){
+                window.location = ('/admin/create');
+            }, 2000);
         }
         const MEETING_STATUS = <%= createMeeting %>;
         if(MEETING_STATUS){
@@ -33,6 +37,7 @@
             </div>
         </div>
     </header>
+    <% if(err != 69){ %> 
     <div class="container">
         <div class="row justify-content-center">
             <form action="/create/meeting/" method="POST">
@@ -45,6 +50,13 @@
             </form>
         </div>
     </div>
+    <% }else{ %>
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <h3>Meeting on going, please go <a href="/">here</a>.</h3>
+        </div>
+    </div>
+    <% } %>
 </body>
 <script src="/main/main.js"></script>
 
