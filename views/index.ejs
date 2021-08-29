@@ -13,15 +13,8 @@
     <script>
         LOGIN_STATE = <%= isLogin %>;
         ERR_STATE = <%= err %>;
-        MEETINGS_PENDING = "<%= meetings %>";
-        if (ERR_STATE == 69420) {
-            alert("Login failed, Try again.")
-        }
-        MY_EMAIL = '<%= email %>';
-        if (MEETINGS_PENDING.length > 0 && LOGIN_STATE) {
-            setTimeout(function () {
-                window.location = (`/${MEETINGS_PENDING}/${MY_EMAIL}`)
-            }, 5000);
+        if (ERR_STATE == 500) {
+            alert("Something went wrong.")
         }
 
     </script>
@@ -37,50 +30,27 @@
             </div>
         </div>
     </header>
-    <% if(!isLogin){ %>
-        <div id="login-area">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <form action="/login-check" method="POST">
-                        <div class="row">
-                            <p id="tag-form">Join your meeting...</p>
-                        </div>
-                        <div class="row">
-                            <input type="email" placeholder="Your registered email address" name="email" id="email">
-                        </div>
-                        <div class="row">
-                            <input type="password" placeholder="Your password" name="password" id="password">
-                        </div>
-                        <div class="row">
-                            <button type="submit">Go &nbsp;<i class="fas fa-arrow-right"></i></button>
-                        </div>
-                    </form>
-                </div>
+    <div id="login-area">
+        <div class="container">
+            <div class="row justify-content-center">
+                <form action="/user/login" method="POST">
+                    <div class="row">
+                        <p id="tag-form">Login to your account...</p>
+                    </div>
+                    <div class="row">
+                        <input type="email" placeholder="Your registered email address" name="email" id="email">
+                    </div>
+                    <div class="row">
+                        <input type="password" placeholder="Your password" name="password" id="password">
+                    </div>
+                    <div class="row">
+                        <button type="submit">Go &nbsp;<i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </form>
             </div>
-
         </div>
-        <% }else{ %>
-            <% if(meetings.length> 0){ %>
-                <div class="container">
-                    <div class="row justify-content-center text-center">
-                        <div style="margin-top: 150px;">
-                            <div class="loading-wrapper rotate">
-                                <div class="circle blue"></div>
-                                <div class="gap-patch"></div>
-                            </div>
-                        </div>
-                        <h3>Joining </h3>
-                    </div>
-                </div>
-                <% }else{ %>
-                    <div class="container">
-                        <div class="row justify-content-center text-center">
-                            <h3>No meetings pending</h3>
 
-                        </div>
-                    </div>
-                    <% } %>
-                        <% } %>
+    </div>
 </body>
 <script src="/main/main.js"></script>
 
