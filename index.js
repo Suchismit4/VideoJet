@@ -57,6 +57,7 @@ app.use(express.json());
 app.use('/peerjs', peerServer);
 
 let pending_meetings = [];
+let started_meetings = [];
 var users = [];
 
 // root route for login
@@ -66,7 +67,7 @@ app.get("/", CheckNotAuth, (req, res) => {
 
 // dashboard 
 app.get('/dashboard', CheckAuth, (req, res) => {
-  res.render('dashboard', {user: req.user, loggedIn: true, err: 100, meetings: pending_meetings})
+  res.render('dashboard', { user: req.user, loggedIn: true, err: 100, meetings: pending_meetings })
 })
 
 app.post('/user/login', CheckNotAuth, passport.authenticate('local', {
@@ -77,14 +78,14 @@ app.post('/user/login', CheckNotAuth, passport.authenticate('local', {
 
 // get request to handle displaying register
 app.get('/admin/register', CheckNotAuth, (req, res) => {
-  // if (req.user.type != "admin") return res.redirect('/');
+  if (req.user.type != "admin") return res.redirect('/');
   res.render('register');
 });
 
 // post signal for login
 app.post('/admin/register/server', CheckNotAuth, async (req, res) => {
   try {
-    // if (req.user.type != "admin") return res.redirect('/');
+    if (req.user.type != "admin") return res.redirect('/');
     const email = req.body.email;
     const password = req.body.password;
     const _hashedPassword = await bcrypt.hash(password, 10);
@@ -95,7 +96,7 @@ app.post('/admin/register/server', CheckNotAuth, async (req, res) => {
       password: _hashedPassword,
       f_name: req.body.f_name,
       l_name: req.body.l_name,
-      type: "admin",
+      type: "student",
     })
     res.redirect('/');
     const TryUpload = async () => {
@@ -108,7 +109,7 @@ app.post('/admin/register/server', CheckNotAuth, async (req, res) => {
         password: _hashedPassword,
         f_name: req.body.f_name,
         l_name: req.body.l_name,
-        type: "admin",
+        type: "student",
       });
       json = JSON.stringify(obj, 2, null);
       await writeFile('./db/users_secure.json', json, 'utf-8');
@@ -125,14 +126,14 @@ app.post('/admin/register/server', CheckNotAuth, async (req, res) => {
 *  Seperate page to create a meeting
 *
 
-app.get('/admin/create', CheckAuth, (req, res) => {
-  if (req.user.type != "auth") return res.redirect('/');
-  if (pending_meeting.length >= 1) {
-    res.render('create.ejs', { createMeeting: false, login: false, err: 500, })
-  } else {
-    res.render('create.ejs', { createMeeting: false, login: false, err: 100 })
-  }
-})
+  app.get('/admin/create', CheckAuth, (req, res) => {
+    if (req.user.type != "auth") return res.redirect('/');
+    if (pending_meeting.length >= 1) {
+      res.render('create.ejs', { createMeeting: false, login: false, err: 500, })
+    } else {
+      res.render('create.ejs', { createMeeting: false, login: false, err: 100 })
+    }
+  })
 
 *  ----------------------------------
 */
@@ -140,13 +141,50 @@ app.get('/admin/create', CheckAuth, (req, res) => {
 // create a meeting
 app.post('/create/meeting/', CheckAuth, (req, res) => {
   const meeting_key = uuidv4();
-  pending_meetings.push(meeting_key);
-  res.send(`${meeting_key}`);
+  const pwd = req.body.pwd == null ? Math.floor(Math.random() * 90000) + 10000 : req.params.pwd;
+  const meeting = {
+    id: Date.now().toString(),
+    key: meeting_key,
+    hostID: req.user.id,
+    pwd: pwd,
+    topic: req.body.topic,
+    type: req.body.type,
+    desc: req.body.desc,
+    start: false,
+    max: 20,
+    users: []
+  }
+  pending_meetings.push(meeting);
+  res.send(meeting);
+});
+
+app.post('/meeting/start/:id', (req, res) => {
+  let meeting = pending_meetings.find(o => o.id == req.params.id);
+  meeting.users.push(req.user.id);
+  res.send(`/meeting/${meeting.key}`);
+  started_meetings.push(meeting);
+  const i = pending_meetings.indexOf(meeting);
+  if (i > -1) {
+    pending_meetings.splice(i, 1);
+  }
+})
+
+app.post('/join/meeting', CheckAuth, (req, res) => {
+  let meeting = started_meetings.find(o => o.id == req.body.id);
+  if(meeting == undefined || meeting.pwd != req.body.pwd) return res.send(500);
+  meeting.users.push(req.user.id);
+  res.send(`/meeting/${meeting.key}`);
 })
 
 // getting the uuid room route
-app.get("/meeting/:room", CheckAuth ,(req, res) => {
-  res.render("room", { roomId: req.params.room });
+app.get("/meeting/:room", CheckAuth, (req, res) => {
+  let meeting = started_meetings.find(o => o.key === req.params.room);
+  if(meeting == undefined) res.redirect('/');
+  else{
+    if(meeting.users.includes(req.user.id)){
+      res.render("room", { roomId: req.params.room });
+    }
+  }
 });
 
 // when a new user connects to our network
@@ -203,6 +241,8 @@ async function LoadUsers() {
     users.push(obj.users[i]);
   }
 }
+
+LoadUsers();
 
 const UpdateUsers = setInterval(async function () {
   const data = await readFile('./db/users_secure.json', 'utf-8');

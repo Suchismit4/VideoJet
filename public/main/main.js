@@ -1,4 +1,7 @@
 let state = false
+function isEmpty(str) {
+    return (!str || str.length === 0 );
+}
 function ShowCreate() {
     if (!state) {
         $("#creation_of_meetings").removeClass('d-none');
@@ -19,19 +22,54 @@ function CreateAMeeting() {
     axios({
         method: 'post',
         url: '/create/meeting/',
+        data: {
+            topic: meetingTopic, 
+            type: meetingType,
+            pwd: meeting_password == "" ? null : meeting_password,
+            desc: meetingDescription
+        }
     })
         .then((response) => {
+            console.log(response)
             $("#meeting_topic_modal").html(meetingTopic);
             $("#meeting_type_modal").html(meetingType);
-            $("#meeting_password_modal").html(meeting_password);
+            $("#meeting_password_modal").html(response.data.pwd);
             $("#meeting_topic_share").html(meetingTopic);
             $("#meeting_type_share").html(meetingType);
             $("#meeting_description_share").html(meetingDescription);
-            $("#meeting_password_share").html(meeting_password);
-            $("#meeting_link_share").html(response.data);
+            $("#meeting_password_share").html(response.data.pwd);
+            $("#meeting_link_share").html(response.data.key);
             $('#modal-after-create').modal('show');
-            $("#start-meeting").attr("onclick",`location.href='https://zooom-clone.atendimento205.repl.co/'${response.data};`);
+            $("#start-meeting").attr("onclick", `StartMeeting(${response.data.id})`);
         }, (error) => {
             console.log(error);
         });
+}
+
+function StartMeeting(ID){
+    axios({
+        method: 'post',
+        url: `/meeting/start/${ID}`,
+    })
+    .then((response) => {
+        window.location.replace(response.data);
+    })
+}
+
+function JoinMeeting(){
+    const id = $("#meeting_id").val();
+    const pwd = $("#meeting_password").val();
+    if(isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
+    axios({
+        method: 'post',
+        url: '/join/meeting',
+        data: {
+            id: id,
+            pwd: pwd
+        }
+    })
+    .then((response) => {
+        if(response.data != 500) window.location.replace(response.data);
+        else return alert("Invalid Meeting ID or password!");
+    })
 }
