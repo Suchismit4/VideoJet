@@ -77,13 +77,13 @@ app.post('/user/login', CheckNotAuth, passport.authenticate('local', {
 }));
 
 // get request to handle displaying register
-app.get('/admin/register', CheckNotAuth, (req, res) => {
+app.get('/admin/register', CheckAuth, (req, res) => {
   if (req.user.type != "admin") return res.redirect('/');
   res.render('register');
 });
 
 // post signal for login
-app.post('/admin/register/server', CheckNotAuth, async (req, res) => {
+app.post('/admin/register/server', CheckAuth, async (req, res) => {
   try {
     if (req.user.type != "admin") return res.redirect('/');
     const email = req.body.email;
