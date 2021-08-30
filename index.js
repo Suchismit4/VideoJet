@@ -61,6 +61,7 @@ app.use('/peerjs', peerServer);
 let pending_meetings = [];
 let started_meetings = [];
 var users = [];
+let rooms = [];
 
 // root route for login
 app.get("/", CheckNotAuth, (req, res) => {
@@ -198,7 +199,6 @@ app.get("/meeting/:room", CheckAuth, (req, res) => {
   }
 });
 
-let rooms = [];
 
 // when a new user connects to our network
 io.on("connection", socket => {
@@ -240,6 +240,15 @@ io.on("connection", socket => {
 
     socket.on("disconnect", reason => {
       io.to(roomId).emit("userDisconnected", userId);
+      for(var i = 0; i < rooms.length; i++){
+        for(var j = 0; j < rooms[i].connected.length; j++){
+          if(rooms[i].connected[j].socketID == socket.id){
+            //found disconnected user
+            console.log(`${rooms[i].connected[j].userID} has left this room ` + rooms[i].id + ` and userID is ${rooms[i].connected[j].userPointer}`);
+            rooms[i].connected.splice(j, 1);
+          }
+        }
+      }
       const clients = io.sockets.adapter.rooms[`${roomId}`];
       const numClients = clients ? clients.size : 0;
       if (numClients <= 0) {
