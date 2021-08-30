@@ -214,7 +214,7 @@ io.on("connection", socket => {
       const clients = io.sockets.adapter.rooms[`${roomId}`];
       const numClients = clients ? clients.size : 0;
       if (numClients <= 0) {
-        pending_meeting.length = 0;
+        pending_meetings.length = 0;
       }
     });
 
