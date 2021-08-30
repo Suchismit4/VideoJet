@@ -1,7 +1,8 @@
 let state = false
 function isEmpty(str) {
-    return (!str || str.length === 0 );
+    return (!str || str.length === 0);
 }
+let meeting_string = ``;
 function ShowCreate() {
     if (!state) {
         $("#creation_of_meetings").removeClass('d-none');
@@ -23,7 +24,7 @@ function CreateAMeeting() {
         method: 'post',
         url: '/create/meeting/',
         data: {
-            topic: meetingTopic, 
+            topic: meetingTopic,
             type: meetingType,
             pwd: meeting_password == "" ? null : meeting_password,
             desc: meetingDescription
@@ -35,9 +36,15 @@ function CreateAMeeting() {
             $("#meeting_type_modal").html(meetingType);
             $("#meeting_password_modal").html(response.data.pwd);
             $("#meeting_topic_share").html(meetingTopic);
+            meeting_string += `Meeting Topic: ${meetingTopic}`;
             $("#meeting_id_share").html(response.data.id);
+            meeting_string += `\nID: ${response.data.id}`;
             $("#meeting_type_share").html(meetingType);
+            meeting_string += `\nMeeting Type: ${meetingType}`;
             $("#meeting_description_share").html(meetingDescription);
+            meeting_string += `\nMeeting Description: ${meetingDescription}`;
+            meeting_string += `\n\nJoin using this link: https://zooom-clone.atendimento205.repl.co/share/meeting/${response.data.id}`
+            meeting_string += `\nPassword: ${response.data.pwd}`;
             $("#meeting_password_share").html(response.data.pwd);
             $("#meeting_link_share").html(response.data.id);
             $('#modal-after-create').modal('show');
@@ -47,20 +54,20 @@ function CreateAMeeting() {
         });
 }
 
-function StartMeeting(ID){
+function StartMeeting(ID) {
     axios({
         method: 'post',
         url: `/meeting/start/${ID}`,
     })
-    .then((response) => {
-        window.location.replace(response.data);
-    })
+        .then((response) => {
+            window.location.replace(response.data);
+        })
 }
 
-function JoinMeeting(){
+function JoinMeeting() {
     const id = $("#meeting_id").val();
     const pwd = $("#meeting_password").val();
-    if(isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
+    if (isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
     axios({
         method: 'post',
         url: '/join/meeting',
@@ -69,9 +76,12 @@ function JoinMeeting(){
             pwd: pwd
         }
     })
-    .then((response) => {
-        if(response.data != 500) window.location.replace(response.data);
-        else return alert("Invalid Meeting ID or password!");
-    })
+        .then((response) => {
+            if (response.data != 500) window.location.replace(response.data);
+            else return alert("Invalid Meeting ID or password!");
+        })
 }
 
+function CopyMeetingShareInvite() {
+    navigator.clipboard.writeText(meeting_string)
+}
