@@ -10,29 +10,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
     <link rel="stylesheet" href="/main/style.css">
-    <script>
-        USER = <%= user %>;
-        const LOGGED_IN = <%= loggedIn %>;
-        MEETING_ID = <%= id %>;
-        function JoinSharedMeeting() {
-            const id = MEETING_ID;
-            const pwd = $("#password").val();
-            if (isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
-            axios({
-                method: 'post',
-                url: '/join/meeting',
-                data: {
-                    id: id,
-                    pwd: pwd
-                }
-            })
-                .then((response) => {
-                    return window.location.replace(response.data);
-                }, (error) => {
-                    if (response.data != 500) return alert("Invalid Meeting ID or password!");
-                })
-        }
-    </script>
 </head>
 
 <body>
@@ -62,6 +39,29 @@
         </div>
     </div>
 </body>
+<script>
+    USER = <%= user %>;
+    const LOGGED_IN = <%= loggedIn %>;
+    MEETING_ID = <%= id %>;
+    function JoinSharedMeeting() {
+        const id = MEETING_ID;
+        const pwd = $("#password").val();
+        if (isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
+        axios({
+            method: 'post',
+            url: '/join/meeting',
+            data: {
+                id: id,
+                pwd: pwd
+            }
+        })
+            .then((response) => {
+                return window.location.replace(response.data);
+            }, (error) => {
+                if (response.data != 500) return alert("Invalid Meeting ID or password!");
+            })
+    }
+</script>
 <script src="/main/main.js"></script>
 
 </html>
