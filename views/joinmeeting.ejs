@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/main/style.css">
     <script>
         USER = <%= user %>;
-        LOGGED_IN = <%= loggedIn %>;
+        const LOGGED_IN = <%= loggedIn %>;
         MEETING_ID = <%= id %>;
     </script>
 </head>
@@ -37,7 +37,7 @@
                     <input type="password" placeholder="Your password" name="password" id="password">
                 </div>
                 <div class="row">
-                    <button onclick="JoinSharedMeeting()">Go &nbsp;<i class="fas fa-arrow-right"></i></button>
+                    <button onclick="JoinSharedMeeting(<%=  %>)">Go &nbsp;<i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
 
