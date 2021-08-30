@@ -1,1 +1,1 @@
-{"users":["default",{"id":"1630242754045","email":"suchismit4@gmail.com","password":"$2b$10$QWTsNFSMcMLptg/jpasileiPboTEBAjiFAbxjw2RmxXrmIjwU5nyq","f_name":"Suchismit","l_name":"Ghosh","type":"admin"}]}
+{"users":["default",{"id":"1630242754045","email":"suchismit4@gmail.com","password":"$2b$10$QWTsNFSMcMLptg/jpasileiPboTEBAjiFAbxjw2RmxXrmIjwU5nyq","f_name":"Suchismit","l_name":"Ghosh","type":"admin"},{"id":"1630308969063","email":"test@user.com","password":"$2b$10$CKzwBtcyDH3tFogVG4bw6uTPz3l.ML8dftt2f8QPi0xJHTudRUYf6","f_name":"Test","l_name":"user","type":"student"}]}
