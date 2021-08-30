@@ -75,21 +75,3 @@ function JoinMeeting(){
     })
 }
 
-function JoinSharedMeeting(){
-    const id = MEETING_ID;
-    const pwd = $("#password").val();
-    if(isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
-    axios({
-        method: 'post',
-        url: '/join/meeting',
-        data: {
-            id: id,
-            pwd: pwd
-        }
-    })
-    .then((response) => {
-        return window.location.replace(response.data);
-    }, (error) => {
-        if(response.data != 500)  return alert("Invalid Meeting ID or password!");
-    })
-}
