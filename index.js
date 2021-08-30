@@ -1,3 +1,5 @@
+// REMINDER: TODO Fix meeting check method to check if a meeting is valid but not started. Implement waiting room.
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
@@ -84,9 +86,10 @@ app.get('/admin/register', CheckAuth, (req, res) => {
 
 app.get('/share/meeting/:id', (req, res) => {
   if(req.isAuthenticated()){
+    console.log(req.paramms.id);
     res.render('joinmeeting.ejs', {user: req.user, loggedIn: true, id: req.params.id});
   }else{
-    res.render('joinmeeting.ejs', {user: null, loggedIn: false, id: null});
+    res.render('joinmeeting.ejs', {user: false, loggedIn: false, id: false});
   }
 })
 

@@ -36,6 +36,8 @@
                     <input type="password" placeholder="Your password" name="password" id="password">
                 </div>
                 <div class="row">
+                    <%= id %>
+
                     <button onclick="JoinSharedMeeting()">Go &nbsp;<i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
@@ -45,7 +47,12 @@
 <script>
     const LOGGED_IN = <%= loggedIn %>;
     MEETING_ID = <%= id %>;
+    if(!LOGGED_IN){
+        alert("You must be signed in to join this meeting.");
+        window.location.href = "/";
+    }
     function JoinSharedMeeting() {
+        if(!LOGGED_IN) return;
         const id = MEETING_ID;
         const pwd = $("#password").val();
         if (isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");

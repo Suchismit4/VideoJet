@@ -16,8 +16,8 @@ img#logo{
     width: 170px;
 }
 
-::selection{
-    background-color: none;
+img::selection{
+    background-color: none !important;
 }
 
 form{
