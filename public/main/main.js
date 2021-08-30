@@ -76,7 +76,6 @@ function JoinMeeting(){
 }
 
 function JoinSharedMeeting(){
-    if(!LOGGED_IN) return alert("You are not logged in with your account");
     const id = MEETING_ID;
     const pwd = $("#password").val();
     if(isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
