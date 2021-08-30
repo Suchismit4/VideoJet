@@ -193,18 +193,44 @@ app.get("/meeting/:room", CheckAuth, (req, res) => {
   if(meeting == undefined) res.redirect('/');
   else{
     if(meeting.users.includes(req.user.id)){
-      res.render("room", { roomId: req.params.room });
+      res.render("room", { roomId: req.params.room, id_user: req.user.id });
     }
   }
 });
 
+let rooms = [];
+
 // when a new user connects to our network
 io.on("connection", socket => {
   // when the event 'join-room' is triggered we are to listen to it.
-  socket.on("join-room", (roomId, userId) => {
+  socket.on("join-room", (roomId, userId, userPointer) => {
     // joining with roomId from front-end (creating a socket room)
+    const room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
+    if(room == undefined) {
+      rooms.push({
+        id: roomId,
+        host: userPointer,
+        hostUserID: userId,
+        socketID: socket.id,
+        connected: [
+          {
+            socketID: socket.id,
+            userPointer: userPointer,
+            userID: userId
+          }
+        ]
+      })
+    }else{
+      // room exists
+      room.connected.push({
+        socketID: socket.id,
+        userPointer: userPointer,
+        userID: userId
+      })
+    }
     socket.join(roomId)
-    console.log(`${userId} has joined this room ` + roomId);
+    console.log(rooms);
+    console.log(`${userId} has joined this room ` + roomId + ` and userID is ${userPointer}`);
     // telling all others that a new user has joined
     socket.to(roomId).broadcast.emit("user-connected", userId);
 
