@@ -7,13 +7,13 @@ myVideo.muted = true;
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "443",
+  port: "3030",
 });
 
 
 peer.on("open", (id) => {
   // broadcasting to all available server (to the server port and http already config)
-  socket.emit("join-room", ROOM_ID, id);
+  socket.emit("join-room", ROOM_ID, id, USER_POINTER);
 });
 
 let videoStream; // global stream
@@ -114,3 +114,4 @@ const toggleMute = () => {
 // $(window).on('beforeunload', function(){
 //   socket.close();
 // });
+
