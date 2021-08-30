@@ -35,10 +35,11 @@ function CreateAMeeting() {
             $("#meeting_type_modal").html(meetingType);
             $("#meeting_password_modal").html(response.data.pwd);
             $("#meeting_topic_share").html(meetingTopic);
+            $("#meeting_id_share").html(response.data.id);
             $("#meeting_type_share").html(meetingType);
             $("#meeting_description_share").html(meetingDescription);
             $("#meeting_password_share").html(response.data.pwd);
-            $("#meeting_link_share").html(response.data.key);
+            $("#meeting_link_share").html(response.data.id);
             $('#modal-after-create').modal('show');
             $("#start-meeting").attr("onclick", `StartMeeting(${response.data.id})`);
         }, (error) => {
@@ -71,5 +72,25 @@ function JoinMeeting(){
     .then((response) => {
         if(response.data != 500) window.location.replace(response.data);
         else return alert("Invalid Meeting ID or password!");
+    })
+}
+
+function JoinSharedMeeting(){
+    if(!LOGGED_IN) return alert("You are not logged in with your account");
+    const id = MEETING_ID;
+    const pwd = $("#password").val();
+    if(isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
+    axios({
+        method: 'post',
+        url: '/join/meeting',
+        data: {
+            id: id,
+            pwd: pwd
+        }
+    })
+    .then((response) => {
+        return window.location.replace(response.data);
+    }, (error) => {
+        if(response.data != 500)  return alert("Invalid Meeting ID or password!");
     })
 }
