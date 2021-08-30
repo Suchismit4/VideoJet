@@ -149,7 +149,7 @@ app.post('/admin/register/server', CheckAuth, async (req, res) => {
 // create a meeting
 app.post('/create/meeting/', CheckAuth, (req, res) => {
   const meeting_key = uuidv4();
-  const pwd = req.body.pwd == null ? Math.floor(Math.random() * 90000) + 10000 : req.params.pwd;
+  const pwd =  Math.floor(Math.random() * 90000) + 10000;
   const meeting = {
     id: Date.now().toString(),
     key: meeting_key,
