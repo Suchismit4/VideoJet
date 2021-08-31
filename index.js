@@ -59,7 +59,7 @@ app.use('/peerjs', peerServer);
 let pending_meetings = [];
 let started_meetings = [];
 var users = [];
-let rooms = [];
+let rooms = []; // all socket rooms
 
 // root route for login
 app.get("/", CheckNotAuth, (req, res) => {
@@ -203,7 +203,8 @@ io.on("connection", socket => {
           {
             socketID: socket.id,
             userPointer: userPointer,
-            userID: userId
+            userID: userId,
+            isHost: true,
           }
         ]
       })
@@ -212,7 +213,8 @@ io.on("connection", socket => {
       room.connected.push({
         socketID: socket.id,
         userPointer: userPointer,
-        userID: userId
+        userID: userId,
+        isHost: false,
       })
     }
     socket.join(roomId)
