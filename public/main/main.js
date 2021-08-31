@@ -31,6 +31,7 @@ function CreateAMeeting() {
         }
     })
         .then((response) => {
+            if(response.data == "err") return window.location.replace('/err')
             console.log(response)
             $("#meeting_topic_modal").html(meetingTopic);
             $("#meeting_type_modal").html(meetingType);
@@ -73,6 +74,7 @@ function StartMeeting(ID) {
                 }
             })
                 .then((response) => {
+                    if(response.data == "err") return window.location.replace('/err')
                     if (response.data != 500) window.location.replace(response.data);
                     else return alert("Invalid Meeting ID or password!");
                 }, (err) => {
@@ -94,6 +96,7 @@ function JoinMeeting() {
         }
     })
         .then((response) => {
+            if(response.data == "err") return window.location.replace('/err')
             if (response.data != 500) window.location.replace(response.data);
             else return alert("Invalid Meeting ID or password!");
         }, (err) => {
