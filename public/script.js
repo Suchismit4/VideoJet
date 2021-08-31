@@ -13,8 +13,8 @@ var peer = new Peer(undefined, {
 
 peer.on("open", (id) => {
   // broadcasting to all available server (to the server port and http already config)
+  myVideo.setAttribute('id', id);
   socket.emit("join-room", ROOM_ID, id, USER_POINTER);
-  myVideo.setAttribute('id', peer.id);
 });
 
 let videoStream; // global stream
