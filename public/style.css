@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+*, p, h1, h2, h3, h4, h5, h6, a, span{
+    font-family: 'Montserrat', sans-serif !important;
+}
+
 #video-grid{
     display: flex;
     justify-content: center;
