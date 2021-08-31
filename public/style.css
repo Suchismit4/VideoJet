@@ -32,7 +32,7 @@ body{
 }
 
 .main__right{
-    flex: 0.2;
+    flex: 1;
     max-width: 20vw;
 }
 
