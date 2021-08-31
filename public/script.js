@@ -35,7 +35,7 @@ navigator.mediaDevices.getUserMedia({
     peer.on("call", (call) => {
       call.answer(stream);
       console.log("answered");
-      const video = document.createElement("video");
+      let video = document.createElement("video");
       video.setAttribute('id', call.peer)
       call.on("stream", (userVideoStream) => {
         addVideoStream(video, userVideoStream);
@@ -66,6 +66,15 @@ navigator.mediaDevices.getUserMedia({
     socket.on('userDisconnected', userId => {
       removeVideoStream(userId);
     })
+
+    socket.on('removeVideo', userId => {
+      console.log(userId)
+      removeVideo(userId)
+    })
+
+    socket.on('addVideo', (userId) => {
+      addVideo(userId)
+    }) 
   });
 
 // playing a video stream
@@ -78,16 +87,27 @@ const addVideoStream = (video, stream) => {
   videoGrid.append(video);
 };
 
-const removeVideoStream = (userId) => {
+const removeVideoStream = userId => {
+  let video = document.getElementById(userId)
+  video.remove()
+}
+
+const removeVideo = userId => {
   let video = document.getElementById(userId);
-  video.parentNode.removeChild(video);
+  console.log(`Removing ${userId}`)
+  video.classList.add("d-none")
+}
+
+const addVideo = userId => {
+  let video = document.getElementById(userId);
+  video.classList.remove("d-none")
 }
 
 // router function to connect to a new user connection
 const connectToNewUser = (userId, stream) => {
-  const call = peer.call(userId, stream); // calling the user peer
+  let call = peer.call(userId, stream); // calling the user peer
   console.log("call made");
-  const video = document.createElement("video");
+  let video = document.createElement("video");
   video.setAttribute('id', userId);
   console.log("New user joined the room with id " + userId);
   call.on("stream", (userVideoStream) => {
@@ -101,14 +121,33 @@ const scrollToBottom = () => {
 }
 
 const toggleMute = () => {
-  const enabled = videoStream.getAudioTracks()[0].enabled;
+  let enabled = videoStream.getAudioTracks()[0].enabled;
   if (enabled) {
     videoStream.getAudioTracks()[0].enabled = false;
     document.querySelector('.mute__button').innerHTML = `<i class="fas fa-microphone-slash"></i><span>Unmute</span>`;
   } else {
     videoStream.getAudioTracks()[0].enabled = true;
-    document.querySelector('.mute__button').innerHTML = `<i class="fas fa-microphone"></i><span>Mute</span>`;
+    document.querySelector('.mute__button').innerHTML = `<i class="fas fa-microphone mute"></i><span>Mute</span>`;
   }
+}
+
+const toggleVideo = () => {
+  let enabled = videoStream.getVideoTracks()[0].enabled
+  if (enabled) {
+    videoStream.getVideoTracks()[0].enabled = false;
+    socket.emit("reqVideoRemove", peer.id)
+    removeVideo(peer.id)
+    document.querySelector('.video__button').innerHTML = `<i class="fas fa-video-slash"></i><span>Start Video</span>`
+  } else {
+    videoStream.getVideoTracks()[0].enabled = true;
+    socket.emit("reqVideoAdd", peer.id)
+    addVideo(peer.id);
+    document.querySelector('.video__button').innerHTML = `<i class="fas fa-video mute"></i><span>Stop Video</span>`
+  }
+}
+
+const leaveMeeting = () => {
+  window.location.href = "../views/post-meeting.ejs"
 }
 
 // $(window).on('beforeunload', function(){

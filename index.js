@@ -130,6 +130,10 @@ app.post('/admin/register/server', CheckAuth, async (req, res) => {
   }
 });
 
+app.get('/post-meeting', (req, res) => {
+  res.render('post-meeting.ejs')
+})
+
 // create a meeting
 app.post('/create/meeting/', CheckAuth, (req, res) => {
   const meeting_key = uuidv4();
@@ -225,6 +229,14 @@ io.on("connection", socket => {
     socket.on('message', message => {
       io.to(roomId).emit('createMessage', message);
     });
+
+    socket.on('reqVideoRemove', id => {
+      io.to(roomId).emit('removeVideo', id);
+    })
+
+    socket.on('reqVideoAdd', id => {
+      io.to(roomId).emit('addVideo', id);
+    })
 
     socket.on("disconnect", reason => {
       io.to(roomId).emit("userDisconnected", userId);

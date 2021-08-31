@@ -78,6 +78,10 @@ body{
     color: red;
 }
 
+.mute{
+    color:rgb(180, 0, 0);
+}
+
 .main__right{
     background-color: #242424;
     border-left: 1px solid;
