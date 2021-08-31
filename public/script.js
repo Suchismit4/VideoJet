@@ -14,6 +14,7 @@ var peer = new Peer(undefined, {
 peer.on("open", (id) => {
   // broadcasting to all available server (to the server port and http already config)
   socket.emit("join-room", ROOM_ID, id, USER_POINTER);
+  myVideo.setAttribute('id', peer.id);
 });
 
 let videoStream; // global stream
@@ -27,7 +28,6 @@ navigator.mediaDevices.getUserMedia({
     // making the stream global to access it everywhere
 
     videoStream = stream;
-    myVideo.setAttribute('id', peer.id);
     addVideoStream(myVideo, stream);
     console.log("My video loaded with id " + peer.id);
 
