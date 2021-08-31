@@ -151,6 +151,9 @@ const toggleChat = () => {
   if(!chat.classList.contains("d-none")){
     chat.classList.add("d-none")
   }
+  else {
+    chat.classList.remove("d-none")
+  }
 }
 
 const leaveMeeting = () => {
