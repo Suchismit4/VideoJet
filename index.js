@@ -153,7 +153,7 @@ app.post('/create/meeting/', CheckAuth, (req, res) => {
 app.get('/err', (req, res) => res.render('err'));
 
 app.post('/meeting/start/:id', CheckAuth ,(req, res) => {
-  if(isOccupied(req.user.id)) return res.redirect('/err');
+  if(isOccupied(req.user.id)) return res.send('err');
   let meeting = pending_meetings.find(o => o.id == req.params.id);
   let data = {
     meeting_id: meeting.id,
@@ -168,9 +168,9 @@ app.post('/meeting/start/:id', CheckAuth ,(req, res) => {
 })
 
 app.post('/join/meeting', CheckAuth, (req, res) => {
-  if(isOccupied(req.user.id)) return res.redirect('/err');
+  if(isOccupied(req.user.id)) return res.send('err');
   let meeting = started_meetings.find(o => o.id == req.body.id);
-  if (meeting == undefined || meeting.pwd != req.body.pwd) return res.redirect('/err');;
+  if (meeting == undefined || meeting.pwd != req.body.pwd) return res.send('err');;
   meeting.users.push(req.user.id);
   res.send(`/meeting/${meeting.key}`);
 })
