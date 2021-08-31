@@ -50,7 +50,7 @@ function CreateAMeeting() {
             $('#modal-after-create').modal('show');
             $("#start-meeting").attr("onclick", `StartMeeting(${response.data.id})`);
         }, (error) => {
-            console.log(error);
+            alert("Unknown error occured!")
         });
 }
 
@@ -60,7 +60,24 @@ function StartMeeting(ID) {
         url: `/meeting/start/${ID}`,
     })
         .then((response) => {
-            window.location.replace(response.data);
+            const id = response.data.meeting_id;
+            const pwd = response.data.meeting_password;
+            console.log(response.data)
+            if (isEmpty(id) || isEmpty(pwd)) return alert("ID or Password cannot be empty");
+            axios({
+                method: 'post',
+                url: '/join/meeting',
+                data: {
+                    id: id,
+                    pwd: pwd
+                }
+            })
+                .then((response) => {
+                    if (response.data != 500) window.location.replace(response.data);
+                    else return alert("Invalid Meeting ID or password!");
+                }, (err) => {
+                    alert("Invalid Meeting ID or password!");
+                })
         })
 }
 
@@ -79,6 +96,8 @@ function JoinMeeting() {
         .then((response) => {
             if (response.data != 500) window.location.replace(response.data);
             else return alert("Invalid Meeting ID or password!");
+        }, (err) => {
+            alert("Invalid Meeting ID or password!");
         })
 }
 

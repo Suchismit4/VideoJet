@@ -13,14 +13,12 @@ const fs = require('fs');
 const { v4: uuidv4 } = require("uuid");
 const utils = require('./utils.js')
 const { ExpressPeerServer } = require("peer");
-const e = require("express");
-// const { Console } = require("console");
 
-// importing essentials for login system 
+// importing essentials for login system
 const bcrypt = require('bcrypt');
 const passport = require('passport')
 const flash = require('express-flash')
-const session = require('express-session') // joks session
+const session = require('express-session') // express session import
 const {
   promisify
 } = require('util')
@@ -86,11 +84,11 @@ app.get('/admin/register', CheckAuth, (req, res) => {
 });
 
 app.get('/share/meeting/:id', (req, res) => {
-  if(req.isAuthenticated()){
-    console.log(req.paramms.id);
-    res.render('joinmeeting.ejs', {user: req.user, loggedIn: true, id: req.params.id});
-  }else{
-    res.render('joinmeeting.ejs', {user: false, loggedIn: false, id: false});
+  if (req.isAuthenticated()) {
+    console.log(req.params.id);
+    res.render('joinmeeting.ejs', { user: req.user, loggedIn: true, id: req.params.id });
+  } else {
+    res.render('joinmeeting.ejs', { user: false, loggedIn: false, id: false });
   }
 })
 
@@ -132,28 +130,10 @@ app.post('/admin/register/server', CheckAuth, async (req, res) => {
   }
 });
 
-/* ----------------------------------
-*         Deprecated [OLD]
-*
-*  Seperate page to create a meeting
-*
-
-  app.get('/admin/create', CheckAuth, (req, res) => {
-    if (req.user.type != "auth") return res.redirect('/');
-    if (pending_meeting.length >= 1) {
-      res.render('create.ejs', { createMeeting: false, login: false, err: 500, })
-    } else {
-      res.render('create.ejs', { createMeeting: false, login: false, err: 100 })
-    }
-  })
-
-*  ----------------------------------
-*/
-
 // create a meeting
 app.post('/create/meeting/', CheckAuth, (req, res) => {
   const meeting_key = uuidv4();
-  const pwd =  Math.floor(Math.random() * 90000) + 10000;
+  const pwd = Math.floor(Math.random() * 90000) + 10000;
   const meeting = {
     id: Date.now().toString(),
     key: meeting_key,
@@ -170,10 +150,16 @@ app.post('/create/meeting/', CheckAuth, (req, res) => {
   res.send(meeting);
 });
 
-app.post('/meeting/start/:id', (req, res) => {
+app.get('/err', (req, res) => res.render('err'));
+
+app.post('/meeting/start/:id', CheckAuth ,(req, res) => {
+  if(isOccupied(req.user.id)) return res.redirect('/err');
   let meeting = pending_meetings.find(o => o.id == req.params.id);
-  meeting.users.push(req.user.id);
-  res.send(`/meeting/${meeting.key}`);
+  let data = {
+    meeting_id: meeting.id,
+    meeting_password: meeting.pwd
+  }
+  res.send(data);
   started_meetings.push(meeting);
   const i = pending_meetings.indexOf(meeting);
   if (i > -1) {
@@ -182,8 +168,9 @@ app.post('/meeting/start/:id', (req, res) => {
 })
 
 app.post('/join/meeting', CheckAuth, (req, res) => {
+  if(isOccupied(req.user.id)) return res.redirect('/err');
   let meeting = started_meetings.find(o => o.id == req.body.id);
-  if(meeting == undefined || meeting.pwd != req.body.pwd) return res.send(500);
+  if (meeting == undefined || meeting.pwd != req.body.pwd) return res.redirect('/err');;
   meeting.users.push(req.user.id);
   res.send(`/meeting/${meeting.key}`);
 })
@@ -191,9 +178,9 @@ app.post('/join/meeting', CheckAuth, (req, res) => {
 // getting the uuid room route
 app.get("/meeting/:room", CheckAuth, (req, res) => {
   let meeting = started_meetings.find(o => o.key === req.params.room);
-  if(meeting == undefined) res.redirect('/');
-  else{
-    if(meeting.users.includes(req.user.id)){
+  if (meeting == undefined) res.redirect('/');
+  else {
+    if (meeting.users.includes(req.user.id)) {
       res.render("room", { roomId: req.params.room, id_user: req.user.id });
     }
   }
@@ -206,12 +193,12 @@ io.on("connection", socket => {
   socket.on("join-room", (roomId, userId, userPointer) => {
     // joining with roomId from front-end (creating a socket room)
     const room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
-    if(room == undefined) {
+    if (room == undefined) {
       rooms.push({
         id: roomId,
         host: userPointer,
         hostUserID: userId,
-        socketID: socket.id,
+        hostsocketID: socket.id,
         connected: [
           {
             socketID: socket.id,
@@ -220,7 +207,7 @@ io.on("connection", socket => {
           }
         ]
       })
-    }else{
+    } else {
       // room exists
       room.connected.push({
         socketID: socket.id,
@@ -229,7 +216,6 @@ io.on("connection", socket => {
       })
     }
     socket.join(roomId)
-    console.log(rooms);
     console.log(`${userId} has joined this room ` + roomId + ` and userID is ${userPointer}`);
     // telling all others that a new user has joined
     socket.to(roomId).broadcast.emit("user-connected", userId);
@@ -240,12 +226,18 @@ io.on("connection", socket => {
 
     socket.on("disconnect", reason => {
       io.to(roomId).emit("userDisconnected", userId);
-      for(var i = 0; i < rooms.length; i++){
-        for(var j = 0; j < rooms[i].connected.length; j++){
-          if(rooms[i].connected[j].socketID == socket.id){
+      for (var i = 0; i < rooms.length; i++) {
+        for (var j = 0; j < rooms[i].connected.length; j++) {
+          if (rooms[i].connected[j].socketID == socket.id) {
             //found disconnected user
             console.log(`${rooms[i].connected[j].userID} has left this room ` + rooms[i].id + ` and userID is ${rooms[i].connected[j].userPointer}`);
+            let meeting = started_meetings.find(o => o.key === rooms[i].id);
+            const index = meeting.users.indexOf(rooms[i].connected[j].userPointer);
+            if (index > -1) {
+              meeting.users.splice(index, 1);
+            }
             rooms[i].connected.splice(j, 1);
+            console.log(rooms[i].connected);
           }
         }
       }
@@ -295,5 +287,19 @@ const UpdateUsers = setInterval(async function () {
   obj = JSON.parse(data);
   users = obj.users;
 }, 25000);
+
+function isOccupied(userID){
+  for(var i = 0; i < started_meetings.length; i++){
+    if(started_meetings[i].users.includes(userID)){
+      return true;
+    }
+  }
+  for(var i = 0; i < started_meetings.length; i++){
+    if(started_meetings[i].users.includes(userID)){
+      return true;
+    }
+  }
+  return false;
+}
 
 server.listen(process.env.PORT || 3030);
