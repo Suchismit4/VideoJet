@@ -146,6 +146,13 @@ const toggleVideo = () => {
   }
 }
 
+const toggleChat = () => {
+  let chat = document.getElementById("chat")
+  if(!chat.classList.contains("d-none")){
+    chat.classList.add("d-none")
+  }
+}
+
 const leaveMeeting = () => {
   window.location.href = "/post-meeting"
 }
