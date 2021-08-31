@@ -147,7 +147,7 @@ const toggleVideo = () => {
 }
 
 const leaveMeeting = () => {
-  window.location.href = "../views/post-meeting.ejs"
+  window.location.href = "/post-meeting"
 }
 
 // $(window).on('beforeunload', function(){
