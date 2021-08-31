@@ -182,7 +182,7 @@ app.get("/meeting/:room", CheckAuth, (req, res) => {
   else {
     if (meeting.users.includes(req.user.id)) {
       res.render("room", { roomId: req.params.room, id_user: req.user.id });
-    }
+    }else return res.redirect('/err');
   }
 });
 
@@ -239,7 +239,6 @@ io.on("connection", socket => {
               meeting.users.splice(index, 1);
             }
             rooms[i].connected.splice(j, 1);
-            console.log(rooms[i].connected);
           }
         }
       }
