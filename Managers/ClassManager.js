@@ -10,7 +10,7 @@ const readFile = promisify(fs.readFile)
 
 let classes = []
 
-const ClassManager = {
+const ClassManagement = {
     GetClasses: async () => {
         const data = await readFile('../db/classes/all.json', 'utf-8');
         obj = JSON.parse(data);
@@ -42,5 +42,5 @@ const ClassManager = {
 }
 
 module.exports = {
-    ClassManager
+    ClassManagement
 }
