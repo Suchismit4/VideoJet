@@ -1,13 +1,14 @@
 const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
+const connectedUsers = {}
 myVideo.muted = true;
 
 // creating a peer
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "443",
+  port: "3030",
 });
 
 
@@ -57,15 +58,18 @@ navigator.mediaDevices.getUserMedia({
     });
 
     socket.on('createMessage', (message, name) => {
-      console.log(name);
       let today = new Date();
       let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      $('.messages').append(`<li class='message'><b>User </b><span class='time'>${time}</span><br/>${message}</li>`)
+      $('.messages').append(`<li class='message'><b>${name} </b><span class='time'>${time}</span><br/>${message}</li>`)
       scrollToBottom();
     });
 
     socket.on('userDisconnected', userId => {
       removeVideoStream(userId);
+
+      if(connectedUsers[userId]){
+        connectedUsers[userId].close()
+      }
     })
 
     socket.on('removeVideo', userId => {
@@ -95,8 +99,11 @@ const removeVideoStream = userId => {
 
 const removeVideo = userId => {
   let video = document.getElementById(userId);
+  if (video){
+    video.classList.add("d-none")
+    console.log(`Could not remove ${userId}`)
+  }
   console.log(`Removing ${userId}`)
-  video.classList.add("d-none")
 }
 
 const addVideo = userId => {
@@ -114,6 +121,8 @@ const connectToNewUser = (userId, stream) => {
   call.on("stream", (userVideoStream) => {
     addVideoStream(video, userVideoStream);
   });
+
+  connectedUsers[userId] = call
 };
 
 const scrollToBottom = () => {
