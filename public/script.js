@@ -13,6 +13,7 @@ var peer = new Peer(undefined, {
 
 peer.on("open", (id) => {
   // broadcasting to all available server (to the server port and http already config)
+  myVideo.setAttribute('id', id);
   socket.emit("join-room", ROOM_ID, id, USER_POINTER);
 });
 
@@ -27,7 +28,6 @@ navigator.mediaDevices.getUserMedia({
     // making the stream global to access it everywhere
 
     videoStream = stream;
-    myVideo.setAttribute('id', peer.id);
     addVideoStream(myVideo, stream);
     console.log("My video loaded with id " + peer.id);
 
@@ -144,6 +144,16 @@ const toggleVideo = () => {
     socket.emit("reqVideoAdd", peer.id)
     addVideo(peer.id);
     document.querySelector('.video__button').innerHTML = `<i class="fas fa-video mute"></i><span>Stop Video</span>`
+  }
+}
+
+const toggleChat = () => {
+  let chat = document.getElementById("chat")
+  if(!chat.classList.contains("d-none")){
+    chat.classList.add("d-none")
+  }
+  else {
+    chat.classList.remove("d-none")
   }
 }
 
