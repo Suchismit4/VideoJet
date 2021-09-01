@@ -302,8 +302,8 @@ const UpdateUsers = setInterval(async function () {
 }, 25000);
 
 function isOccupied(userID) {
-  for (var i = 0; i < started_meetings.length; i++) {
-    if (started_meetings[i].users.includes(userID)) {
+  for (var i = 0; i < pending_meetings.length; i++) {
+    if (pending_meetings[i].users.includes(userID)) {
       return true;
     }
   }
