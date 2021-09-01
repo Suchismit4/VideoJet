@@ -51,12 +51,13 @@ navigator.mediaDevices.getUserMedia({
 
     $('html').keydown((e) => {
       if(e.which == 13 && msg.val().length !== 0) {
-        socket.emit('message', msg.val());
+        socket.emit('message', msg.val(), USER_POINTER);
         msg.val('');
       }
     });
 
-    socket.on('createMessage', message => {
+    socket.on('createMessage', (message, name) => {
+      console.log(name);
       let today = new Date();
       let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       $('.messages').append(`<li class='message'><b>User </b><span class='time'>${time}</span><br/>${message}</li>`)

@@ -85,7 +85,6 @@ app.get('/admin/register', CheckAuth, (req, res) => {
 
 app.get('/share/meeting/:id', (req, res) => {
   if (req.isAuthenticated()) {
-    console.log(req.params.id);
     res.render('joinmeeting.ejs', { user: req.user, loggedIn: true, id: req.params.id });
   } else {
     res.render('joinmeeting.ejs', { user: false, loggedIn: false, id: false });
@@ -226,8 +225,10 @@ io.on("connection", socket => {
     // telling all others that a new user has joined
     socket.to(roomId).broadcast.emit("user-connected", userId);
 
-    socket.on('message', message => {
-      io.to(roomId).emit('createMessage', message);
+    socket.on('message', (message, whoSentID) => {
+      const user = users.find(o => o.id == parseInt(whoSentID));
+      const name = user.f_name;
+      io.to(roomId).emit('createMessage', message, name);
     });
 
     socket.on('reqVideoRemove', id => {
@@ -243,7 +244,7 @@ io.on("connection", socket => {
       for (var i = 0; i < rooms.length; i++) {
         for (var j = 0; j < rooms[i].connected.length; j++) {
           if (rooms[i].connected[j].socketID == socket.id) {
-            //found disconnected user
+            // found disconnected user (guranteed to be only one)
             console.log(`${rooms[i].connected[j].userID} has left this room ` + rooms[i].id + ` and userID is ${rooms[i].connected[j].userPointer}`);
             let meeting = started_meetings.find(o => o.key === rooms[i].id);
             const index = meeting.users.indexOf(rooms[i].connected[j].userPointer);
@@ -260,7 +261,6 @@ io.on("connection", socket => {
         pending_meetings.length = 0;
       }
     });
-
   });
 
 });
