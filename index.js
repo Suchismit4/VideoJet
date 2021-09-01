@@ -12,6 +12,7 @@ const io = require("socket.io")(server);
 const fs = require('fs');
 const { v4: uuidv4 } = require("uuid");
 const utils = require('./utils.js')
+const ClassManager = require('./Managers/ClassManager.js')
 const { ExpressPeerServer } = require("peer");
 
 // importing essentials for login system
@@ -258,8 +259,13 @@ io.on("connection", socket => {
       const clients = io.sockets.adapter.rooms[`${roomId}`];
       const numClients = clients ? clients.size : 0;
       if (numClients <= 0) {
-        pending_meetings.length = 0;
+        let meeting = started_meetings.find(o => o.key == roomId);
+        const index = started_meetings.indexOf(meeting);
+        if(index > -1){
+          started_meetings.splice(index, 1);
+        }
       }
+
     });
   });
 
