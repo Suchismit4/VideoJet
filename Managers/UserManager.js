@@ -41,6 +41,9 @@ const UserManagement = {
         json = JSON.stringify(obj, 2, null);
         await writeFile('./db/users_secure.json', json, 'utf-8');
         return users;
+    },
+    GetUser: async (users, id) => {
+        return users.find(o => o.id === id);
     }
 }
 
