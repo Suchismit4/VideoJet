@@ -17,7 +17,7 @@ const UserManagement = {
         if(user.type == "student") return true;
         else return false;
     },
-    isStudent: (user) => {
+    isTeacher: (user) => {
         if(user.type == "classTeacher") return true;
         else return false;
     },
