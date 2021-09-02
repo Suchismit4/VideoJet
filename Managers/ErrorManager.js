@@ -3,8 +3,18 @@ const ErrorManagement = {
         Registration: {
             Classes: {
                 ClassExists: async () => {
-                    return console.log("Class Already Exists");
+                    return console.log("Error: Class Already Exists");
                 }
+            }
+        },
+        Permissions: {
+            Insufficient: async () => {
+                return console.log("Error: Insufficient permissions to do this task");
+            }
+        },
+        Development: {
+            TODO: async () => {
+                return console.log("Error: TODO");
             }
         }
     }

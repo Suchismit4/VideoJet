@@ -4,7 +4,8 @@ const {
 } = require('util')
 const path = require("path");
 const Utils = require('../utils.js')
-const ErrManager = require('./ErrorManager')
+const ErrManager = require('./ErrorManager');
+const { UserManagement } = require('./UserManager.js');
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 
@@ -17,7 +18,8 @@ const ClassManagement = {
         classes = obj.classes;
         return classes;
     },
-    RegisterClass: async (grade, section, classTeacher, admin) => {
+    RegisterClass: async (grade, section, classTeacher, admin, schoolID) => {
+        if(!UserManagement.isAdmin(admin)) return ErrManager.ThrowError.Permissions.Insufficient();
         GetClasses();
         if (Utils.ClassExists(grade, section, classes))
             return ErrManager.ThrowError.Registration.Classes.ClassExists();
@@ -29,6 +31,7 @@ const ClassManagement = {
             createdBy: admin,
             students: [],
             schedule: [],
+            schoolID: schoolID,
         }
         classes.push(newClass);
         const data = await readFile('../db/classes/all.json', 'utf-8');
