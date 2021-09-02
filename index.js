@@ -12,6 +12,7 @@ const io = require("socket.io")(server);
 const fs = require('fs');
 const { v4: uuidv4 } = require("uuid");
 const utils = require('./utils.js')
+const ClassManager = require('./Managers/ClassManager.js')
 const { ExpressPeerServer } = require("peer");
 
 // importing essentials for login system
@@ -25,6 +26,9 @@ const {
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 const initializePassport = require('./passport-config.js');
+const { UserManagement } = require('./Managers/UserManager.js');
+const { ErrorManagement } = require('./Managers/ErrorManager.js');
+const { SchoolManagement } = require('./Managers/SchoolManager.js');
 initializePassport(
   passport,
   email => users.find(user => user.email === email),
@@ -71,8 +75,13 @@ app.get('/dashboard', CheckAuth, (req, res) => {
   res.render('dashboard', { user: req.user, loggedIn: true, err: 100, meetings: pending_meetings })
 })
 
+app.get('/aft/login/router', CheckAuth, (req, res) => {
+  if (UserManagement.isAdmin(req.user)) return res.redirect(`/school/${req.user.schoolID}/admin`);
+  else return res.redirect('/dashboard');
+})
+
 app.post('/user/login', CheckNotAuth, passport.authenticate('local', {
-  successRedirect: '/dashboard',
+  successRedirect: '/aft/login/router',
   failureRedirect: '/',
   failureFlash: true
 }));
@@ -189,6 +198,36 @@ app.get("/meeting/:room", CheckAuth, (req, res) => {
   }
 });
 
+/*
+    Class Rooms & School
+
+    This is the start of all routes 
+    which are required to get or
+    posted to for all class room
+    related actions for schools
+
+*/
+
+app.get('/school/:schoolID/admin', CheckAuth, async (req, res) => {
+  if (!UserManagement.isAdmin(req.user)) {
+    ErrorManagement.ThrowError.Permissions.Insufficient();
+    return res.send(500);
+  } else {
+    const school = await SchoolManagement.GetSchool(1630507665048);
+    res.render('admin', { school: school })
+  }
+})
+
+app.get('/school/:schoolID/classroom', (req, res) => {
+
+})
+
+
+/*
+
+    End of Class room routes
+
+*/
 
 // when a new user connects to our network
 io.on("connection", socket => {
@@ -226,7 +265,7 @@ io.on("connection", socket => {
     socket.to(roomId).broadcast.emit("user-connected", userId);
 
     socket.on('message', (message, whoSentID) => {
-      const user = users.find(o => o.id == parseInt(whoSentID));
+      const user = users.find(o => o.id == whoSentID);
       const name = user.f_name;
       io.to(roomId).emit('createMessage', message, name);
     });
@@ -258,8 +297,13 @@ io.on("connection", socket => {
       const clients = io.sockets.adapter.rooms[`${roomId}`];
       const numClients = clients ? clients.size : 0;
       if (numClients <= 0) {
-        pending_meetings.length = 0;
+        let meeting = started_meetings.find(o => o.key == roomId);
+        const index = started_meetings.indexOf(meeting);
+        if (index > -1) {
+          started_meetings.splice(index, 1);
+        }
       }
+
     });
   });
 
@@ -302,8 +346,8 @@ const UpdateUsers = setInterval(async function () {
 }, 25000);
 
 function isOccupied(userID) {
-  for (var i = 0; i < started_meetings.length; i++) {
-    if (started_meetings[i].users.includes(userID)) {
+  for (var i = 0; i < pending_meetings.length; i++) {
+    if (pending_meetings[i].users.includes(userID)) {
       return true;
     }
   }
