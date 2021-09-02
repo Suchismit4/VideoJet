@@ -10,7 +10,16 @@ const key = "kuz*TSbT2mCK+tMGmL7s7hr8#n&gmtmJ@8SgspF$WRRunNR!L-_?x2ekWVcX3M?vKPw
 
 
 const manager = {
-    
+    ClassExists: (grade, section, classes) => {
+        let flag = false;
+        for(var i = 0; i < classes.length; i++){
+            if(flag) break;
+            const _class = classes[i];
+            if(_class.grade == grade && _class.section == section)
+                flag = true;
+        }
+        return flag;
+    }
 }
 
 module.exports = {
