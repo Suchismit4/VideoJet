@@ -232,6 +232,7 @@ app.get('/school/:schoolID/classroom', (req, res) => {
 
 // when a new user connects to our network
 io.on("connection", socket => {
+  console.log("how")
   // when the event 'join-room' is triggered we are to listen to it.
   socket.on("join-room", (roomId, userId, userPointer) => {
     // joining with roomId from front-end (creating a socket room)
@@ -250,8 +251,7 @@ io.on("connection", socket => {
             isHost: true,
           }
         ]
-      }
-      rooms.push(room)
+      })
     } else {
       // room exists
       room.connected.push({
@@ -266,17 +266,8 @@ io.on("connection", socket => {
     console.log(`${userId} has joined this room ` + roomId + ` and userID is ${userPointer}`);
     // telling all others that a new user has joined
     let userObj = users.find(o => o.id == userPointer)
-    io.to(roomId).emit("user-connected", userId, userObj.f_name, userObj.l_name, userPointer);
-
-    socket.on('sendDetails', (userId, senderUserId, userPointer, f_name, l_name) => {
-      let user = room.connected.find(o => o.userID == userId)
-      console.log(io.sockets.connected)
-      console.log(socket.id)
-      console.log(user.socketID)
-
-      io.sockets.connected[user.socketID].emit('receiveDetails', senderUserId, userPointer, f_name, l_name)
-    })
-
+    io.to(roomId).emit("user-connected", userId, []);
+    
     socket.on('message', (message, whoSentID) => {
       const user = users.find(o => o.id == whoSentID);
       const name = user.f_name;

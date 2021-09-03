@@ -2,16 +2,10 @@ const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
 const connectedPeers = {}
-// const connectedUsers = {}
+let allConnectedInRoom = [];
 const root = document.documentElement
-// const myUserObj = {
-//   id: USER_POINTER,
-//   f_name: F_NAME,
-//   l_name: L_NAME
-// }
-// connectedUsers[USER_POINTER] = myUserObj
 myVideo.muted = true;
-
+let myUser = {};
 // creating a peer
 var peer = new Peer(undefined, {
   path: "/peerjs",
@@ -31,9 +25,9 @@ let videoStream; // global stream
 
 // getting the available media from the browser
 navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: true,
-  })
+  video: true,
+  audio: true,
+})
   .then((stream) => {
     // making the stream global to access it everywhere
 
@@ -44,14 +38,12 @@ navigator.mediaDevices.getUserMedia({
     // answering a peer call
     peer.on("call", (call) => {
       call.answer(stream);
-      console.log("answered");
       let video = document.createElement("video");
       video.setAttribute('id', call.peer)
       call.on("stream", (userVideoStream) => {
-        if(!connectedPeers[call.peer]){
+        if (!connectedPeers[call.peer]) {
           connectedPeers[call.peer] = call
           addVideoStream(video, userVideoStream, call.peer);
-          console.log("answering")
         }
       });
 
@@ -59,34 +51,17 @@ navigator.mediaDevices.getUserMedia({
     });
 
     // listening to a new user connection
-    socket.on("user-connected", (userId, f_name, l_name, userPointer) => {
-      // let userObj = {
-      //   id : userPointer,
-      //   f_name: f_name,
-      //   l_name: l_name,
-      //   peer_id: userId
-      // }
-      // connectedUsers[userObj.id] = userObj
-      // socket.emit('sendDetails', userId, peer.id, USER_POINTER, F_NAME, L_NAME)
-      setTimeout(connectToNewUser,5000,stream, userId);
+    socket.on("user-connected", (userId, myUser, connectedUsers) => {
+      myUser = myUser;
+      allConnectedInRoom = connectedUsers;
+      setTimeout(connectToNewUser, 5000, stream, userId);
+      console.log(allConnectedInRoom);
     });
-
-    // socket.on('receiveDetails', (senderPeerId, senderId, f_name, l_name) => {
-    //   console.log("details received")
-    //   let userObj = {
-    //     f_name: f_name,
-    //     l_name: l_name,
-    //     id: senderId,
-    //     peer_id: senderPeerId
-    //   }
-    //   connectedUsers[senderId] = userObj
-    //   console.log("details added")
-    // })
 
     let msg = $('input');
 
     $('html').keydown((e) => {
-      if(e.which == 13 && msg.val().length !== 0) {
+      if (e.which == 13 && msg.val().length !== 0) {
         socket.emit('message', msg.val(), USER_POINTER);
         msg.val('');
       }
@@ -99,12 +74,12 @@ navigator.mediaDevices.getUserMedia({
       scrollToBottom();
     });
 
-    socket.on('userDisconnected', userId => {
+    socket.on('userDisconnected', (userId, connectedUser) => {
       removeVideoStream(userId);
-      if(connectedPeers[userId]){
+      if (connectedPeers[userId]) {
         connectedPeers[userId].close()
         delete connectedPeers[userId]
-        // delete connectedUsers[userId]
+        allConnectedInRoom = connectedUsers
       }
       updateVideo()
     })
@@ -116,7 +91,7 @@ navigator.mediaDevices.getUserMedia({
 
     socket.on('addVideo', (userId) => {
       addVideo(userId)
-    }) 
+    })
   });
 
 // playing a video stream
@@ -157,7 +132,7 @@ const removeVideoStream = userId => {
 
 const removeVideo = userId => {
   let video = document.getElementById(userId);
-  if (video){
+  if (video) {
     video.classList.add("d-none")
     console.log(`Could not remove ${userId}`)
   }
@@ -170,12 +145,12 @@ const addVideo = userId => {
 }
 
 const updateVideo = () => {
-  let numUsers = Object.keys(connectedPeers).length+1
-  if(numUsers == 1) {
+  let numUsers = Object.keys(connectedPeers).length + 1
+  if (numUsers == 1) {
     root.style.setProperty("--vidWidth", '100%')
   } else if (numUsers > 1 && numUsers < 3) {
     root.style.setProperty("--vidWidth", '48%')
-  } else if (numUsers > 2 && numUsers < 4){
+  } else if (numUsers > 2 && numUsers < 4) {
     root.style.setProperty("--vidWidth", '30%')
   } else if (numUsers > 5 && numUsers < 7) {
     root.style.setProperty("--vidWidth", '28%')
@@ -192,7 +167,7 @@ const connectToNewUser = (stream, userId) => {
   video.setAttribute('id', userId);
   console.log("New user joined the room with id " + userId);
   call.on("stream", (userVideoStream) => {
-    if(!connectedPeers[call.peer]){
+    if (!connectedPeers[call.peer]) {
       connectedPeers[userId] = call
       addVideoStream(video, userVideoStream, call.peer);
       console.log("calling")
@@ -235,7 +210,7 @@ const toggleVideo = () => {
 
 const toggleChat = () => {
   let chat = document.getElementById("chat")
-  if(!chat.classList.contains("d-none")){
+  if (!chat.classList.contains("d-none")) {
     chat.classList.add("d-none")
   }
   else {
@@ -245,7 +220,7 @@ const toggleChat = () => {
 
 const toggleParticipants = () => {
   let participants = document.getElementById("participant__list")
-  if(!participants.classList.contains("d-none")){
+  if (!participants.classList.contains("d-none")) {
     participants.classList.add("d-none")
   } else {
     participants.classList.remove("d-none")
