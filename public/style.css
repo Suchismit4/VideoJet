@@ -4,16 +4,28 @@ p, h1, h2, h3, h4, h5, h6, a, span{
     font-family: 'Montserrat', sans-serif;
 }
 
+:root{
+    --vidWidth: 100%;
+}
+
 #video-grid{
     display: flex;
+    flex-direction: row;
     justify-content: center;
+    align-items: center;
 }
 
 video{
-    height: 300px;
-    width: 400px;
-    object-fit: cover;
+    height: 100%;
 }
+
+.video-wrapper{
+    width: var(--vidWidth);
+    margin: 3px;
+    aspect-ratio: 4/3;
+    position: relative;
+}
+
 
 body{
     margin: 0;
@@ -32,8 +44,11 @@ body{
 }
 
 .main__right{
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
     max-width: 20vw;
+
 }
 
 .main__videos{
@@ -101,12 +116,39 @@ body{
     min-height: 60px;
 }
 
+#chat{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 20vw;
+    min-height: 50vh;
+    border-color: #1c1c1c;
+    border-top-width: 1px;
+    border-style: solid;
+}
+
+#participant__list{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 20vw;
+    min-height: 50vh;
+    border-color: #1c1c1c;
+    border-top-width: 1px;
+    border-style: solid;
+}
+
 .main__header h6{
     margin: 0;
     padding: 0;
 }
 
 .main__chat__window{
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.main__participants__window{
     flex-grow: 1;
     overflow-y: auto;
 }
@@ -146,6 +188,17 @@ body{
     margin-left: 5px;
 }
 
+.name-tag{
+    background-color: #1c1c1c;
+    position: absolute;
+    opacity: 0.8;
+    height: 7%;
+    width: 100%;
+    bottom: 5px;
+    left: 0;
+    color: white;
+}
+
 #video-grid{
     display: flex;
     justify-content: center;
@@ -153,7 +206,3 @@ body{
     flex-wrap: wrap;
 }
 
-video{
-    flex-grow: 1;
-    margin: 2.5px;
-}
