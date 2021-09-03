@@ -5,7 +5,11 @@ const connectedPeers = {}
 let allConnectedInRoom = [];
 const root = document.documentElement
 myVideo.muted = true;
-let myUser = {};
+let myUser = {
+  id: USER_POINTER,
+  f_name: F_NAME,
+  l_name: L_NAME
+};
 // creating a peer
 var peer = new Peer(undefined, {
   path: "/peerjs",
@@ -51,12 +55,16 @@ navigator.mediaDevices.getUserMedia({
     });
 
     // listening to a new user connection
-    socket.on("user-connected", (userId, myUser, connectedUsers) => {
-      myUser = myUser;
-      allConnectedInRoom = connectedUsers;
+    socket.on("user-connected", (userId) => {
       setTimeout(connectToNewUser, 5000, stream, userId);
-      console.log(allConnectedInRoom);
     });
+    
+    socket.on('connected-users-list', (connectedUsers) => {
+      allConnectedInRoom = connectedUsers;
+      const user = allConnectedInRoom.find(o => o.id == myUser.id);
+      const index = allConnectedInRoom.indexOf(user);
+      if(index > -1) allConnectedInRoom.splice(index, 1);
+    })
 
     let msg = $('input');
 
@@ -74,7 +82,7 @@ navigator.mediaDevices.getUserMedia({
       scrollToBottom();
     });
 
-    socket.on('userDisconnected', (userId, connectedUser) => {
+    socket.on('userDisconnected', (userId, connectedUsers) => {
       removeVideoStream(userId);
       if (connectedPeers[userId]) {
         connectedPeers[userId].close()
@@ -162,7 +170,6 @@ const updateVideo = () => {
 // router function to connect to a new user connection
 const connectToNewUser = (stream, userId) => {
   let call = peer.call(userId, stream); // calling the user peer
-  console.log("call made");
   let video = document.createElement("video");
   video.setAttribute('id', userId);
   console.log("New user joined the room with id " + userId);
@@ -170,8 +177,8 @@ const connectToNewUser = (stream, userId) => {
     if (!connectedPeers[call.peer]) {
       connectedPeers[userId] = call
       addVideoStream(video, userVideoStream, call.peer);
-      console.log("calling")
     }
+
   });
 
   // connectedUsers[userObj.id] = userObj
