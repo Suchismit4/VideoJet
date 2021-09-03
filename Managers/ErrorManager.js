@@ -13,8 +13,13 @@ const ErrorManagement = {
             }
         },
         Development: {
-            TODO: async () => {
-                return console.log("Error: TODO");
+            TODO: async (err) => {
+                return console.log("Error: TODO " + err);
+            }
+        },
+        General: {
+            ClassNotFound: (id) => {
+                return console.log("Error: Class was not found wih ID: " + id)
             }
         }
     }

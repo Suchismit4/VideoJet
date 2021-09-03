@@ -4,7 +4,7 @@ const {
 } = require('util')
 const path = require("path");
 const Utils = require('../utils.js')
-const ErrManager = require('./ErrorManager')
+const ErrManager = require('./ErrorManager');
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 
@@ -44,6 +44,15 @@ const UserManagement = {
     },
     GetUser: async (users, id) => {
         return users.find(o => o.id === id);
+    },
+    Assign: {
+        ClassTeacher: async (classes, id, classID, section) => {
+            const _class = classes.find(o => o.id === classID);
+            if(_class == undefined) return ErrManager.ErrorManagement.ThrowError.General.ClassNotFound(classID);
+            const data = await readFile('./db/users_secure.json', 'utf-8');
+            obj = JSON.parse(data);
+            return true;
+        }
     }
 }
 
