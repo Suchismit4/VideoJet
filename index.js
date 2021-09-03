@@ -218,6 +218,7 @@ app.get('/school/:schoolID/admin', CheckAuth, async (req, res) => {
   }
 })
 
+
 app.get('/school/:schoolID/classroom', (req, res) => {
 
 })
@@ -235,8 +236,8 @@ io.on("connection", socket => {
   socket.on("join-room", (roomId, userId, userPointer) => {
     // joining with roomId from front-end (creating a socket room)
     let room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
-    if (!room) {
-      room = {
+    if (room == undefined) {
+      rooms.push({
         id: roomId,
         host: userPointer,
         hostUserID: userId,
@@ -259,6 +260,7 @@ io.on("connection", socket => {
         userID: userId,
         isHost: false,
       })
+      room = rooms.find(o => o.id === roomId);
     }
     socket.join(roomId)
     console.log(`${userId} has joined this room ` + roomId + ` and userID is ${userPointer}`);
