@@ -5,7 +5,7 @@ const {
 const path = require("path");
 const Utils = require('../utils.js')
 const ErrManager = require('./ErrorManager');
-const { UserManagement } = require('./UserManager.js');
+const { UserManagement } = require('./UserManager');
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 
@@ -13,7 +13,7 @@ let classes = []
 
 const ClassManagement = {
     GetClasses: async () => {
-        const data = await readFile('../db/classes/all.json', 'utf-8');
+        const data = await readFile('./db/classes/all.json', 'utf-8');
         obj = JSON.parse(data);
         classes = obj.classes;
         return classes;
@@ -34,12 +34,12 @@ const ClassManagement = {
             schoolID: schoolID,
         }
         classes.push(newClass);
-        const data = await readFile('../db/classes/all.json', 'utf-8');
+        const data = await readFile('./db/classes/all.json', 'utf-8');
         obj = JSON.parse(data);
         var classes = obj.classes;
         classes.push(newClass)
         json = JSON.stringify(obj, 2, null);
-        await writeFile('../db/classes/all.json', json, 'utf-8');
+        await writeFile('./db/classes/all.json', json, 'utf-8');
         return newClass;
     }
 }

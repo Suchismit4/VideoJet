@@ -10,10 +10,17 @@ const readFile = promisify(fs.readFile)
 
 const SchoolManagement = {
     GetAllSchools: async () => {
-        return ErrManager.ErrorManagement.ThrowError.Development.TODO();
+        ErrManager.ErrorManagement.ThrowError.Development.TODO("GetAllSchools function() { native }");
+        return [{
+            id: id,
+            name: "Delhi Public School Ruby Park",
+            city: "Kolkata",
+            state: "West Bengal",
+            classes: [],
+        }]
     },
     GetSchool: async (id) => {
-        ErrManager.ErrorManagement.ThrowError.Development.TODO();
+        ErrManager.ErrorManagement.ThrowError.Development.TODO("GetSchool function() { native }");
         return {
             id: id,
             name: "Delhi Public School Ruby Park",
