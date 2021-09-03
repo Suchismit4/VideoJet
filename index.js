@@ -193,7 +193,7 @@ app.get("/meeting/:room", CheckAuth, (req, res) => {
   if (meeting == undefined) res.redirect('/');
   else {
     if (meeting.users.includes(req.user.id)) {
-      res.render("room", { roomId: req.params.room, id_user: req.user.id });
+      res.render("room", { roomId: req.params.room, id_user: req.user.id, f_name: req.user.f_name, l_name: req.user.l_name});
     } else return res.redirect('/err');
   }
 });
@@ -234,9 +234,9 @@ io.on("connection", socket => {
   // when the event 'join-room' is triggered we are to listen to it.
   socket.on("join-room", (roomId, userId, userPointer) => {
     // joining with roomId from front-end (creating a socket room)
-    const room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
-    if (room == undefined) {
-      rooms.push({
+    let room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
+    if (!room) {
+      room = {
         id: roomId,
         host: userPointer,
         hostUserID: userId,
@@ -249,7 +249,8 @@ io.on("connection", socket => {
             isHost: true,
           }
         ]
-      })
+      }
+      rooms.push(room)
     } else {
       // room exists
       room.connected.push({
@@ -262,7 +263,17 @@ io.on("connection", socket => {
     socket.join(roomId)
     console.log(`${userId} has joined this room ` + roomId + ` and userID is ${userPointer}`);
     // telling all others that a new user has joined
-    socket.to(roomId).broadcast.emit("user-connected", userId);
+    let userObj = users.find(o => o.id == userPointer)
+    io.to(roomId).emit("user-connected", userId, userObj.f_name, userObj.l_name, userPointer);
+
+    socket.on('sendDetails', (userId, senderUserId, userPointer, f_name, l_name) => {
+      let user = room.connected.find(o => o.userID == userId)
+      console.log(io.sockets.connected)
+      console.log(socket.id)
+      console.log(user.socketID)
+
+      io.sockets.connected[user.socketID].emit('receiveDetails', senderUserId, userPointer, f_name, l_name)
+    })
 
     socket.on('message', (message, whoSentID) => {
       const user = users.find(o => o.id == whoSentID);
@@ -283,7 +294,7 @@ io.on("connection", socket => {
       for (var i = 0; i < rooms.length; i++) {
         for (var j = 0; j < rooms[i].connected.length; j++) {
           if (rooms[i].connected[j].socketID == socket.id) {
-            // found disconnected user (guranteed to be only one)
+            // found disconnected user (guaranteed to be only one)
             console.log(`${rooms[i].connected[j].userID} has left this room ` + rooms[i].id + ` and userID is ${rooms[i].connected[j].userPointer}`);
             let meeting = started_meetings.find(o => o.key === rooms[i].id);
             const index = meeting.users.indexOf(rooms[i].connected[j].userPointer);
