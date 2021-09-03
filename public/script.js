@@ -1,7 +1,15 @@
 const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
-const connectedUsers = {}
+const connectedPeers = {}
+// const connectedUsers = {}
+const root = document.documentElement
+// const myUserObj = {
+//   id: USER_POINTER,
+//   f_name: F_NAME,
+//   l_name: L_NAME
+// }
+// connectedUsers[USER_POINTER] = myUserObj
 myVideo.muted = true;
 
 // creating a peer
@@ -15,6 +23,7 @@ var peer = new Peer(undefined, {
 peer.on("open", (id) => {
   // broadcasting to all available server (to the server port and http already config)
   myVideo.setAttribute('id', id);
+  // connectedUsers[USER_POINTER].peer_id = id
   socket.emit("join-room", ROOM_ID, id, USER_POINTER);
 });
 
@@ -29,7 +38,7 @@ navigator.mediaDevices.getUserMedia({
     // making the stream global to access it everywhere
 
     videoStream = stream;
-    addVideoStream(myVideo, stream);
+    addVideoStream(myVideo, stream, peer.id);
     console.log("My video loaded with id " + peer.id);
 
     // answering a peer call
@@ -39,14 +48,40 @@ navigator.mediaDevices.getUserMedia({
       let video = document.createElement("video");
       video.setAttribute('id', call.peer)
       call.on("stream", (userVideoStream) => {
-        addVideoStream(video, userVideoStream);
+        if(!connectedPeers[call.peer]){
+          connectedPeers[call.peer] = call
+          addVideoStream(video, userVideoStream, call.peer);
+          console.log("answering")
+        }
       });
+
+
     });
 
     // listening to a new user connection
-    socket.on("user-connected", (userId) => {
-      setTimeout(connectToNewUser,3000,userId,stream);
+    socket.on("user-connected", (userId, f_name, l_name, userPointer) => {
+      // let userObj = {
+      //   id : userPointer,
+      //   f_name: f_name,
+      //   l_name: l_name,
+      //   peer_id: userId
+      // }
+      // connectedUsers[userObj.id] = userObj
+      // socket.emit('sendDetails', userId, peer.id, USER_POINTER, F_NAME, L_NAME)
+      setTimeout(connectToNewUser,5000,stream, userId);
     });
+
+    // socket.on('receiveDetails', (senderPeerId, senderId, f_name, l_name) => {
+    //   console.log("details received")
+    //   let userObj = {
+    //     f_name: f_name,
+    //     l_name: l_name,
+    //     id: senderId,
+    //     peer_id: senderPeerId
+    //   }
+    //   connectedUsers[senderId] = userObj
+    //   console.log("details added")
+    // })
 
     let msg = $('input');
 
@@ -66,10 +101,12 @@ navigator.mediaDevices.getUserMedia({
 
     socket.on('userDisconnected', userId => {
       removeVideoStream(userId);
-
-      if(connectedUsers[userId]){
-        connectedUsers[userId].close()
+      if(connectedPeers[userId]){
+        connectedPeers[userId].close()
+        delete connectedPeers[userId]
+        // delete connectedUsers[userId]
       }
+      updateVideo()
     })
 
     socket.on('removeVideo', userId => {
@@ -83,18 +120,39 @@ navigator.mediaDevices.getUserMedia({
   });
 
 // playing a video stream
-const addVideoStream = (video, stream) => {
+const addVideoStream = (video, stream, userId) => {
   video.srcObject = stream; // assign the src to the stream
   // wait for video data to load then play
   video.addEventListener("loadedmetadata", () => {
     video.play();
   });
-  videoGrid.append(video);
+
+  // let user = Object.values(connectedUsers).find(o => o.peer_id == userId)
+
+  if (!(video && stream)) {
+    console.log(stream)
+    console.log("bobo moment")
+    return;
+
+  }
+  let wrapper = document.createElement("div")
+  wrapper.classList.add("video-wrapper")
+  wrapper.append(video)
+  let nameTag = document.createElement('div')
+  nameTag.classList.add('name-tag')
+  const info = document.createTextNode(`Ribu pls gib name`)
+  nameTag.append(info)
+  wrapper.append(nameTag)
+  videoGrid.append(wrapper);
+
+  updateVideo()
+
+  console.log(`Added a video with id ${userId}`)
+
 };
 
 const removeVideoStream = userId => {
-  let video = document.getElementById(userId)
-  video.remove()
+  document.getElementById(userId).parentElement.remove()
 }
 
 const removeVideo = userId => {
@@ -111,18 +169,37 @@ const addVideo = userId => {
   video.classList.remove("d-none")
 }
 
+const updateVideo = () => {
+  let numUsers = Object.keys(connectedPeers).length+1
+  if(numUsers == 1) {
+    root.style.setProperty("--vidWidth", '100%')
+  } else if (numUsers > 1 && numUsers < 3) {
+    root.style.setProperty("--vidWidth", '48%')
+  } else if (numUsers > 2 && numUsers < 4){
+    root.style.setProperty("--vidWidth", '30%')
+  } else if (numUsers > 5 && numUsers < 7) {
+    root.style.setProperty("--vidWidth", '28%')
+  } else if (numUsers > 6) {
+    root.style.setProperty("--vidWidth", '18%')
+  }
+}
+
 // router function to connect to a new user connection
-const connectToNewUser = (userId, stream) => {
+const connectToNewUser = (stream, userId) => {
   let call = peer.call(userId, stream); // calling the user peer
   console.log("call made");
   let video = document.createElement("video");
   video.setAttribute('id', userId);
   console.log("New user joined the room with id " + userId);
   call.on("stream", (userVideoStream) => {
-    addVideoStream(video, userVideoStream);
+    if(!connectedPeers[call.peer]){
+      connectedPeers[userId] = call
+      addVideoStream(video, userVideoStream, call.peer);
+      console.log("calling")
+    }
   });
 
-  connectedUsers[userId] = call
+  // connectedUsers[userObj.id] = userObj
 };
 
 const scrollToBottom = () => {
@@ -163,6 +240,15 @@ const toggleChat = () => {
   }
   else {
     chat.classList.remove("d-none")
+  }
+}
+
+const toggleParticipants = () => {
+  let participants = document.getElementById("participant__list")
+  if(!participants.classList.contains("d-none")){
+    participants.classList.add("d-none")
+  } else {
+    participants.classList.remove("d-none")
   }
 }
 

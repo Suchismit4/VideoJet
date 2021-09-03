@@ -5,6 +5,7 @@ const {
 const path = require("path");
 const Utils = require('../utils.js')
 const ErrManager = require('./ErrorManager')
+// const database = require('../db/users_secure.json')
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 
