@@ -274,6 +274,7 @@ io.on("connection", socket => {
       const user = users.find(o => o.id == element.userPointer);
       connectedUsers.push({
         id: user.id,
+        peerID: element.userID,
         f_name: user.f_name,
         l_name: user.l_name,
         email: user.email,
