@@ -27,6 +27,13 @@ peer.on("open", (id) => {
 
 let videoStream; // global stream
 
+socket.on('connected-users-list', (connectedUsers) => {
+  allConnectedInRoom = connectedUsers;
+  // const user = allConnectedInRoom.find(o => o.id == myUser.id);
+  // const index = allConnectedInRoom.indexOf(user);
+  // if(index > -1) allConnectedInRoom.splice(index, 1);
+})
+
 // getting the available media from the browser
 navigator.mediaDevices.getUserMedia({
   video: true,
@@ -55,16 +62,11 @@ navigator.mediaDevices.getUserMedia({
     });
 
     // listening to a new user connection
-    socket.on("user-connected", (userId) => {
+    socket.on("user-connected", (userId, connectedUsers) => {
+      allConnectedInRoom = connectedUsers;
       setTimeout(connectToNewUser, 5000, stream, userId);
     });
     
-    socket.on('connected-users-list', (connectedUsers) => {
-      allConnectedInRoom = connectedUsers;
-      const user = allConnectedInRoom.find(o => o.id == myUser.id);
-      const index = allConnectedInRoom.indexOf(user);
-      if(index > -1) allConnectedInRoom.splice(index, 1);
-    })
 
     let msg = $('input');
 

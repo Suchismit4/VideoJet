@@ -194,7 +194,7 @@ app.get("/meeting/:room", CheckAuth, (req, res) => {
   if (meeting == undefined) res.redirect('/');
   else {
     if (meeting.users.includes(req.user.id)) {
-      res.render("room", { roomId: req.params.room, id_user: req.user.id, f_name: req.user.f_name, l_name: req.user.l_name});
+      res.render("room", { roomId: req.params.room, id_user: req.user.id, f_name: req.user.f_name, l_name: req.user.l_name });
     } else return res.redirect('/err');
   }
 });
@@ -263,23 +263,24 @@ io.on("connection", socket => {
       room = rooms.find(o => o.id === roomId);
     }
     socket.join(roomId)
-    
+
     console.log(`${userId} has joined this room ` + roomId + ` and userID is ${userPointer}`);
+
+    // telling all others that a new user has joined 
     room = rooms.find(o => o.id == roomId);
     const _connectedUsers = room.connected;
     let connectedUsers = [];
     _connectedUsers.forEach(element => {
-        const user = users.find(o => o.id == element.userPointer);
-          connectedUsers.push({
-            id: user.id,
-            f_name: user.f_name,
-            l_name: user.l_name,
-            email: user.email,
-          })
+      const user = users.find(o => o.id == element.userPointer);
+      connectedUsers.push({
+        id: user.id,
+        f_name: user.f_name,
+        l_name: user.l_name,
+        email: user.email,
+      })
     });
-    // telling all others that a new user has joined 
-    socket.to(roomId).broadcast.emit("user-connected", userId);
     io.sockets.in(roomId).emit('connected-users-list', connectedUsers);
+    socket.to(roomId).broadcast.emit("user-connected", userId, connectedUsers);
     socket.on('message', (message, whoSentID) => {
       const user = users.find(o => o.id == whoSentID);
       const name = user.f_name;
