@@ -29,9 +29,6 @@ let videoStream; // global stream
 
 socket.on('connected-users-list', (connectedUsers) => {
   allConnectedInRoom = connectedUsers;
-  // const user = allConnectedInRoom.find(o => o.id == myUser.id);
-  // const index = allConnectedInRoom.indexOf(user);
-  // if(index > -1) allConnectedInRoom.splice(index, 1);
 })
 
 // getting the available media from the browser
