@@ -3,7 +3,7 @@ var _socket = io("http://localhost:8000", { transports: ['websocket'] });
 _socket.on('welcome', function () {
 	app.id = _socket.id;
 	console.log("Connected to the server!");
-	StartCameraStreaming()
+	// StartCameraStreaming()
 });
 
 // Handle BufferHeader request/response
@@ -47,8 +47,12 @@ _socket.on('presenterGone', function (id) {
 _socket.on('connect-response', (clients) => {
 	for (const clientId of clients) {
 		if (clientId != app.id) {
-			StartStreaming(clientId)
+			setTimeout(function(){
+				// StartStreaming(clientId)
+			}, 500);
 		}
 	}
 	$("#connectToAudioPopUp").addClass('d-none');
 })
+
+_socket.emit('connect-request', ROOM_ID);

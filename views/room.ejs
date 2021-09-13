@@ -33,7 +33,7 @@
     <div class="d-none">
         <sf-m name="the-app">
             <div class="gray-text">Your socket ID: <span>{{ id }}</span></div>
-    
+
             <div class="little-space">App debug:</div>
         </sf-m>
     </div>
@@ -41,7 +41,8 @@
         <div class="container">
             <div class="row justify-content-center text-center">
                 <h3>You are currently not connected to auido</h3>
-                <p>Your audio is encrypted and streamed accross the data centers from replit. No audio is recorded nor stored.</p>
+                <p>Your audio is encrypted and streamed accross the data centers from replit. No audio is recorded nor
+                    stored.</p>
             </div>
             <div class="row justify-content-center">
                 <button onclick="ConnectAsBoth()">Connect to audio</button>
@@ -58,10 +59,12 @@
             <div class="main__controls">
                 <div class="main__controls__block">
                     <!-- Toggle StartStreaming() -->
-                    <div class="main__controls__button mute__button" onclick="toggleMute()">
+                    <div class="main__controls__button mute__button" onclick="StartPresenting()">
                         <i class="fas fa-microphone mute"></i>
                         <span>Mute</span>
                     </div>
+                    <input type="text" placeholder="socket.id" id="connectSocketID"> <button
+                        onclick="				StartStreamingAudio()                    ">connect</button>
                     <div class="main__controls__button video__button" onclick="toggleVideo()">
                         <i class="fas fa-video mute"></i>
                         <span>Stop Video</span>
@@ -118,10 +121,10 @@
         </div>
     </div>
 </body>
-<script src="../script.js"></script>
 <script src="../scarlet-stream/the-app.js"></script>
 <script src="../scarlet-stream/presenter.js"></script>
 <script src="../scarlet-stream/streamer.js"></script>
 <script src="../scarlet-stream/socket.js"></script>
+<script src="../script.js"></script>
 
 </html>
