@@ -9,7 +9,9 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const server = require("http").Server(app);
-const io = require("socket.io")(server);
+const io = require("socket.io")(server, {
+  perMessageDeflate: false // Disable compression
+});
 const fs = require('fs');
 const { v4: uuidv4 } = require("uuid");
 const utils = require('./utils.js')
@@ -233,6 +235,7 @@ app.get('/school/:schoolID/classroom', (req, res) => {
 
 // when a new user connects to our network
 io.on("connection", socket => {
+  socket.emit('welcome', socket.id);
   // when the event 'join-room' is triggered we are to listen to it.
   socket.on("join-room", (roomId, userId, userPointer) => {
     // joining with roomId from front-end (creating a socket room)
