@@ -65,7 +65,7 @@ navigator.mediaDevices.getUserMedia({
     socket.on("user-connected", (userId, connectedUsers, socketIDConnect) => {
       allConnectedInRoom = connectedUsers;
       setTimeout(connectToNewUser, 5000, stream, userId);
-      if (socketIDConnect != myUser.id) _socket.emit('connect-request', ROOM_ID);
+      // if (socketIDConnect != myUser.id) _socket.emit('connect-request', ROOM_ID);
     });
     
 
@@ -195,12 +195,12 @@ const scrollToBottom = () => {
 }
 
 const toggleMute = () => {
-  let enabled = videoStream.getAudioTracks()[0].enabled;
+  let enabled = true;
   if (enabled) {
-    videoStream.getAudioTracks()[0].enabled = false;
+    StopPresenting();
     document.querySelector('.mute__button').innerHTML = `<i class="fas fa-microphone-slash"></i><span>Unmute</span>`;
   } else {
-    videoStream.getAudioTracks()[0].enabled = true;
+    StartPresenting();
     document.querySelector('.mute__button').innerHTML = `<i class="fas fa-microphone mute"></i><span>Mute</span>`;
   }
 }
