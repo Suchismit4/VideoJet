@@ -62,6 +62,8 @@ navigator.mediaDevices.getUserMedia({
     socket.on("user-connected", (userId, connectedUsers) => {
       allConnectedInRoom = connectedUsers;
       setTimeout(connectToNewUser, 5000, stream, userId);
+      _socket.emit('connect-request', ROOM_ID);
+
     });
 
 
@@ -257,8 +259,8 @@ const ConnectAsBoth = () => {
 _socket.on('connect-response', (clients) => {
   console.log(clients)
   for (const clientId of clients) {
-    if(clientId != app.id){
-      setTimeout(function(){ 
+    if (clientId != app.id) {
+      setTimeout(function () {
         StartStreaming(clientId)
       }, 100);
     }
