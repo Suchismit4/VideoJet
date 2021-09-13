@@ -67,7 +67,7 @@ navigator.mediaDevices.getUserMedia({
       setTimeout(connectToNewUser, 5000, stream, userId);
       if (socketIDConnect != myUser.id) _socket.emit('connect-request', ROOM_ID);
     });
-
+    
 
     let msg = $('input');
 
@@ -247,22 +247,3 @@ const leaveMeeting = () => {
 //   socket.close();
 // });
 
-const ConnectAsBoth = () => {
-  console.log(app.id);
-  let flag = true;
-  while (flag) {
-    if (app.id == null || app.id == ' ' || app.id == '' || app.id == "")
-      continue;
-
-    flag = false;
-    StartPresenting();
-    //
-  }
-}
-
-
-function StartStreamingAudio(){
-  console.log("sending request now...")
-  const id = document.getElementById("connectSocketID").value;
-  StartStreaming(id)
-}

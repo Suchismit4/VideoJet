@@ -1,26 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zoom Clone</title>
     <link rel="stylesheet" href="../style.css">
-    <script src='https://cdn.jsdelivr.net/npm/scarletsframe@0.34.5/dist/scarletsframe.min.js'></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
     <script src="../socket.io/socket.io.js"></script>
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <script src="https://kit.fontawesome.com/1fbc7a0c23.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/opus-media-recorder@latest/OpusMediaRecorder.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/opus-media-recorder@latest/encoderWorker.umd.js"></script>
-    <script src='https://cdn.jsdelivr.net/npm/sfmediastream@v1'></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
     <script>
         const ROOM_ID = "<%= roomId %>";
         const USER_POINTER = "<%= id_user %>";
@@ -28,48 +19,26 @@
         const L_NAME = "<%= l_name %>"
     </script>
 </head>
-
 <body>
-    <div class="d-none">
-        <sf-m name="the-app">
-            <div class="gray-text">Your socket ID: <span>{{ id }}</span></div>
-
-            <div class="little-space">App debug:</div>
-        </sf-m>
-    </div>
-    <div class="connectToAudio" id="connectToAudioPopUp">
-        <div class="container">
-            <div class="row justify-content-center text-center">
-                <h3>You are currently not connected to auido</h3>
-                <p>Your audio is encrypted and streamed accross the data centers from replit. No audio is recorded nor
-                    stored.</p>
-            </div>
-            <div class="row justify-content-center">
-                <button onclick="ConnectAsBoth()">Connect to audio</button>
-            </div>
-        </div>
-    </div>
     <div class="main">
         <div class="main__left">
             <div class="main__videos">
                 <div id="video-grid">
-
+                    
                 </div>
             </div>
             <div class="main__controls">
                 <div class="main__controls__block">
-                    <!-- Toggle StartStreaming() -->
-                    <div class="main__controls__button mute__button" onclick="StartPresenting()">
+                    <div class="main__controls__button mute__button" onclick="toggleMute()">
                         <i class="fas fa-microphone mute"></i>
                         <span>Mute</span>
                     </div>
-                    <input type="text" placeholder="socket.id" id="connectSocketID"> <button
-                        onclick="				StartStreamingAudio()                    ">connect</button>
                     <div class="main__controls__button video__button" onclick="toggleVideo()">
                         <i class="fas fa-video mute"></i>
                         <span>Stop Video</span>
                     </div>
                 </div>
+
                 <div class="main__controls__block">
                     <div class="main__controls__button">
                         <i class="fas fa-shield-alt"></i>
@@ -121,10 +90,5 @@
         </div>
     </div>
 </body>
-<script src="../scarlet-stream/the-app.js"></script>
-<script src="../scarlet-stream/presenter.js"></script>
-<script src="../scarlet-stream/streamer.js"></script>
-<script src="../scarlet-stream/socket.js"></script>
 <script src="../script.js"></script>
-
 </html>
