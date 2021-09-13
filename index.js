@@ -284,7 +284,7 @@ io.on("connection", socket => {
       })
     });
     io.sockets.in(roomId).emit('connected-users-list', connectedUsers);
-    socket.to(roomId).broadcast.emit("user-connected", userId, connectedUsers);
+    socket.to(roomId).broadcast.emit("user-connected", userId, connectedUsers, socket.id);
     socket.on('message', (message, whoSentID) => {
       const user = users.find(o => o.id == whoSentID);
       const name = user.f_name;
