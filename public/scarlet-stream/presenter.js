@@ -18,6 +18,7 @@ bufferHeader = null;
 // Start recording, or create instance first
 this.started = false;
 StartPresenting = function () {
+	console.log(app.id);
 	if (!presenterInstance)
 		createInstance();
 

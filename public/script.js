@@ -33,80 +33,79 @@ socket.on('connected-users-list', (connectedUsers) => {
   allConnectedInRoom = connectedUsers;
 })
 
-function StartCameraStreaming() {
 
-  // getting the available media from the browser
-  navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: false,
-  })
-    .then((stream) => {
-      // making the stream global to access it everywhere
+// getting the available media from the browser
+navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: false,
+})
+  .then((stream) => {
+    // making the stream global to access it everywhere
 
-      videoStream = stream;
-      addVideoStream(myVideo, stream, peer.id);
-      console.log("My video loaded with id " + peer.id);
+    videoStream = stream;
+    addVideoStream(myVideo, stream, peer.id);
+    console.log("My video loaded with id " + peer.id);
 
-      // answering a peer call
-      peer.on("call", (call) => {
-        call.answer(stream);
-        let video = document.createElement("video");
-        video.setAttribute('id', call.peer)
-        call.on("stream", (userVideoStream) => {
-          if (!connectedPeers[call.peer]) {
-            connectedPeers[call.peer] = call
-            addVideoStream(video, userVideoStream, call.peer);
-          }
-        });
-
-
-      });
-
-      // listening to a new user connection
-      socket.on("user-connected", (userId, connectedUsers, socketIDConnect) => {
-        allConnectedInRoom = connectedUsers;
-        setTimeout(connectToNewUser, 5000, stream, userId);
-        if (socketIDConnect != myUser.id) _socket.emit('connect-request', ROOM_ID);
-      });
-
-
-      let msg = $('input');
-
-      $('html').keydown((e) => {
-        if (e.which == 13 && msg.val().length !== 0) {
-          socket.emit('message', msg.val(), USER_POINTER);
-          msg.val('');
+    // answering a peer call
+    peer.on("call", (call) => {
+      call.answer(stream);
+      let video = document.createElement("video");
+      video.setAttribute('id', call.peer)
+      call.on("stream", (userVideoStream) => {
+        if (!connectedPeers[call.peer]) {
+          connectedPeers[call.peer] = call
+          addVideoStream(video, userVideoStream, call.peer);
         }
       });
 
-      socket.on('createMessage', (message, name) => {
-        let today = new Date();
-        let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        $('.messages').append(`<li class='message'><b>${name} </b><span class='time'>${time}</span><br/>${message}</li>`)
-        scrollToBottom();
-      });
 
-      socket.on('userDisconnected', (userId, connectedUsers) => {
-        removeVideoStream(userId);
-        if (connectedPeers[userId]) {
-          connectedPeers[userId].close()
-          delete connectedPeers[userId]
-          allConnectedInRoom = connectedUsers
-        }
-        updateVideo()
-      })
-
-      socket.on('removeVideo', userId => {
-        console.log(userId)
-        removeVideo(userId)
-      })
-
-      socket.on('addVideo', (userId) => {
-        addVideo(userId)
-      })
     });
 
-}
+    // listening to a new user connection
+    socket.on("user-connected", (userId, connectedUsers, socketIDConnect) => {
+      allConnectedInRoom = connectedUsers;
+      setTimeout(connectToNewUser, 5000, stream, userId);
+      if (socketIDConnect != myUser.id) _socket.emit('connect-request', ROOM_ID);
+    });
+
+
+    let msg = $('input');
+
+    $('html').keydown((e) => {
+      if (e.which == 13 && msg.val().length !== 0) {
+        socket.emit('message', msg.val(), USER_POINTER);
+        msg.val('');
+      }
+    });
+
+    socket.on('createMessage', (message, name) => {
+      let today = new Date();
+      let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      $('.messages').append(`<li class='message'><b>${name} </b><span class='time'>${time}</span><br/>${message}</li>`)
+      scrollToBottom();
+    });
+
+    socket.on('userDisconnected', (userId, connectedUsers) => {
+      removeVideoStream(userId);
+      if (connectedPeers[userId]) {
+        connectedPeers[userId].close()
+        delete connectedPeers[userId]
+        allConnectedInRoom = connectedUsers
+      }
+      updateVideo()
+    })
+
+    socket.on('removeVideo', userId => {
+      console.log(userId)
+      removeVideo(userId)
+    })
+
+    socket.on('addVideo', (userId) => {
+      addVideo(userId)
+    })
+  });
+
+
 
 // playing a video stream
 const addVideoStream = (video, stream, userId) => {
@@ -257,7 +256,13 @@ const ConnectAsBoth = () => {
 
     flag = false;
     StartPresenting();
-    _socket.emit('connect-request', ROOM_ID);
+    //
   }
 }
 
+
+function StartStreamingAudio(){
+  console.log("sending request now...")
+  const id = document.getElementById("connectSocketID").value;
+  StartStreaming(id)
+}
