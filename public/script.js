@@ -34,7 +34,7 @@ socket.on('connected-users-list', (connectedUsers) => {
 // getting the available media from the browser
 navigator.mediaDevices.getUserMedia({
   video: true,
-  audio: true,
+  audio: false,
 })
   .then((stream) => {
     // making the stream global to access it everywhere
@@ -63,7 +63,7 @@ navigator.mediaDevices.getUserMedia({
       allConnectedInRoom = connectedUsers;
       setTimeout(connectToNewUser, 5000, stream, userId);
     });
-    
+
 
     let msg = $('input');
 
@@ -241,3 +241,27 @@ const leaveMeeting = () => {
 //   socket.close();
 // });
 
+const ConnectAsBoth = () => {
+  console.log(app.id);
+  let flag = true;
+  while (flag) {
+    if (app.id == null || app.id == ' ' || app.id == '' || app.id == "")
+      continue;
+
+    flag = false;
+    StartPresenting();
+    _socket.emit('connect-request', ROOM_ID);
+  }
+}
+
+_socket.on('connect-response', (clients) => {
+  console.log(clients)
+  for (const clientId of clients) {
+    if(clientId != app.id){
+      setTimeout(function(){ 
+        StartStreaming(clientId)
+      }, 100);
+    }
+  }
+  $("#connectToAudioPopUp").addClass('d-none');
+})
