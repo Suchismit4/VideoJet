@@ -234,20 +234,18 @@ app.get('/school/:schoolID/classroom', (req, res) => {
 // when a new user connects to our network
 io.on("connection", socket => {
   // when the event 'join-room' is triggered we are to listen to it.
-  socket.on("join-room", (roomId, userId, userPointer) => {
+  socket.on("join-room", (roomId, userPointer) => {
     // joining with roomId from front-end (creating a socket room)
     let room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
     if (room == undefined) {
       rooms.push({
         id: roomId,
         host: userPointer,
-        hostUserID: userId,
         hostsocketID: socket.id,
         connected: [
           {
             socketID: socket.id,
             userPointer: userPointer,
-            userID: userId,
             isHost: true,
           }
         ]
@@ -257,14 +255,13 @@ io.on("connection", socket => {
       room.connected.push({
         socketID: socket.id,
         userPointer: userPointer,
-        userID: userId,
         isHost: false,
       })
       room = rooms.find(o => o.id === roomId);
     }
     socket.join(roomId)
 
-    console.log(`${userId} has joined this room ` + roomId + ` and userID is ${userPointer}`);
+    console.log(`${userPointer} has joined this room ` + roomId);
 
     // telling all others that a new user has joined 
     room = rooms.find(o => o.id == roomId);
@@ -274,14 +271,13 @@ io.on("connection", socket => {
       const user = users.find(o => o.id == element.userPointer);
       connectedUsers.push({
         id: user.id,
-        peerID: element.userID,
         f_name: user.f_name,
         l_name: user.l_name,
         email: user.email,
       })
     });
     io.sockets.in(roomId).emit('connected-users-list', connectedUsers);
-    socket.to(roomId).broadcast.emit("user-connected", userId, connectedUsers, socket.id);
+    socket.to(roomId).broadcast.emit("user-connected", connectedUsers, socket.id);
     socket.on('message', (message, whoSentID) => {
       const user = users.find(o => o.id == whoSentID);
       const name = user.f_name;
@@ -297,12 +293,23 @@ io.on("connection", socket => {
     })
 
     socket.on("disconnect", reason => {
-      io.to(roomId).emit("userDisconnected", userId);
+      const _connectedUsers = room.connected;
+      let connectedUsers = [];
+      _connectedUsers.forEach(element => {
+        const user = users.find(o => o.id == element.userPointer);
+        connectedUsers.push({
+          id: user.id,
+          f_name: user.f_name,
+          l_name: user.l_name,
+          email: user.email,
+        })
+      });
+      io.to(roomId).emit("userDisconnected", userPointer, connectedUsers);
       for (var i = 0; i < rooms.length; i++) {
         for (var j = 0; j < rooms[i].connected.length; j++) {
           if (rooms[i].connected[j].socketID == socket.id) {
             // found disconnected user (guaranteed to be only one)
-            console.log(`${rooms[i].connected[j].userID} has left this room ` + rooms[i].id + ` and userID is ${rooms[i].connected[j].userPointer}`);
+            console.log(`${rooms[i].connected[j].userPointer} has left this room ` + rooms[i].id);
             let meeting = started_meetings.find(o => o.key === rooms[i].id);
             const index = meeting.users.indexOf(rooms[i].connected[j].userPointer);
             if (index > -1) {
@@ -363,14 +370,14 @@ const UpdateUsers = setInterval(async function () {
   users = obj.users;
 }, 25000);
 
-function isOccupied(userID) {
+function isOccupied(userPointer) {
   for (var i = 0; i < pending_meetings.length; i++) {
-    if (pending_meetings[i].users.includes(userID)) {
+    if (pending_meetings[i].users.includes(userPointer)) {
       return true;
     }
   }
   for (var i = 0; i < started_meetings.length; i++) {
-    if (started_meetings[i].users.includes(userID)) {
+    if (started_meetings[i].users.includes(userPointer)) {
       return true;
     }
   }

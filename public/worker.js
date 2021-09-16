@@ -1,6 +1,5 @@
 const serverURL = "wss://zoomclone.ga/ws";
 const videoGrid = document.getElementById("video-grid");
-const root = document.documentElement
 const signalLocal = new Signal.IonSFUJSONRPCSignal(serverURL);
 const clientLocal = new IonSDK.Client(signalLocal, {});
 
@@ -11,6 +10,7 @@ signalLocal.onopen = async () => {
     });
 }
 clientLocal.ontrack = (track, stream) => {
+    console.log(stream)
     let videoEl = document.createElement('video');
     console.log("[SFU]:   Got stream (track): ", track.id, "for stream: ", stream.id);
     if (track.kind == 'video') {
@@ -31,6 +31,7 @@ clientLocal.ontrack = (track, stream) => {
             videoGrid.append(wrapper);
             updateVideos();
             stream.onremovetrack = (e) => {
+                console.log(e)
                 console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
                 if (e.track.kind == 'video') {
                     const removeVideo = document.getElementById(e.track.id);
@@ -75,20 +76,3 @@ const StartStreaming = () => {
     }).catch(console.error);
 }
 
-
-
-const updateVideos = () => {
-    let numUsers = allConnectedInRoom.length;
-    console.log(allConnectedInRoom)
-    if (numUsers == 1) {
-        root.style.setProperty("--vidWidth", '100%')
-    } else if (numUsers > 1 && numUsers < 3) {
-        root.style.setProperty("--vidWidth", '48%')
-    } else if (numUsers > 2 && numUsers < 4) {
-        root.style.setProperty("--vidWidth", '30%')
-    } else if (numUsers > 5 && numUsers < 7) {
-        root.style.setProperty("--vidWidth", '28%')
-    } else if (numUsers > 6) {
-        root.style.setProperty("--vidWidth", '18%')
-    }
-}

@@ -3,7 +3,7 @@ const socket = io("/");
 // const myVideo = document.createElement("video");
 // const connectedPeers = {}
 let allConnectedInRoom = [];
-// const root = document.documentElement
+const root = document.documentElement
 // myVideo.muted = true;
 // let myUser = {
 //   id: USER_POINTER,
@@ -27,13 +27,30 @@ let allConnectedInRoom = [];
 //   socket.emit("join-room", ROOM_ID, id, USER_POINTER);
 // });
 
-// let videoStream; // global stream
+// let videoStream; // global 
 
-socket.emit("join-room", ROOM_ID, null, USER_POINTER);
+const updateVideos = () => {
+  let numUsers = allConnectedInRoom.length;
+  if (numUsers == 1) {
+      root.style.setProperty("--vidWidth", '100%')
+  } else if (numUsers > 1 && numUsers < 3) {
+      root.style.setProperty("--vidWidth", '48%')
+  } else if (numUsers > 2 && numUsers < 4) {
+      root.style.setProperty("--vidWidth", '30%')
+  } else if (numUsers > 5 && numUsers < 7) {
+      root.style.setProperty("--vidWidth", '28%')
+  } else if (numUsers > 6) {
+      root.style.setProperty("--vidWidth", '18%')
+  }
+}
+
+socket.emit("join-room", ROOM_ID, USER_POINTER);
 socket.on('connected-users-list', (connectedUsers) => {
+  console.log(connectedUsers);
   allConnectedInRoom = connectedUsers;
 })
-socket.on("user-connected", (userId, connectedUsers, socketIDConnect) => {
+socket.on("user-connected", (connectedUsers, socketIDConnect) => {
+  console.log(connectedUsers)
   allConnectedInRoom = connectedUsers;
 });
 
@@ -44,9 +61,10 @@ socket.on('createMessage', (message, name) => {
   scrollToBottom();
 });
 
-socket.on('userDisconnected', (userId, connectedUsers) => {
+socket.on('userDisconnected', (userID, connectedUsers) => {
+  console.log(connectedUsers)
   allConnectedInRoom = connectedUsers;
-  updateVideo()
+  updateVideos()
 })
 
 /*
