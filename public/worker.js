@@ -15,12 +15,12 @@ clientLocal.ontrack = (track, stream) => {
     console.log("[SFU]:   Got stream (track): ", track.id, "for stream: ", stream.id);
     if (track.kind == 'video') {
         track.onunmute = () => {
-            videoEl.id = track.id;
             videoEl.controls = false;
             videoEl.srcObject = stream;
             videoEl.autoplay = true;
             videoEl.muted = false;
             let wrapper = document.createElement("div")
+            wrapper.id = track.id;
             wrapper.classList.add("video-wrapper")
             wrapper.append(videoEl)
             let nameTag = document.createElement('div')
@@ -34,7 +34,8 @@ clientLocal.ontrack = (track, stream) => {
                 console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
                 if (e.track.kind == 'video') {
                     const removeVideo = document.getElementById(e.track.id);
-                    subVideo.removeChild(removeVideo);
+                    videoGrid.removeChild(removeVideo);
+                    updateVideos();
                 }
             }
         }
