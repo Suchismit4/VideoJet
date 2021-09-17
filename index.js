@@ -393,3 +393,5 @@ function isOccupied(userPointer) {
 }
 
 server.listen(process.env.PORT || 3030);
+
+// TODO: handle tracks on disconnect
