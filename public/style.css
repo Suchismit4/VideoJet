@@ -202,7 +202,7 @@ body {
     margin-left: 5px;
 }
 
-.name-tag {
+.name-tag, .name-tag-mine {
     background-color: #1c1c1c;
     position: absolute;
     opacity: 0.8;

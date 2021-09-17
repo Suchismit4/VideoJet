@@ -235,6 +235,7 @@ app.get('/school/:schoolID/classroom', (req, res) => {
 io.on("connection", socket => {
   // when the event 'join-room' is triggered we are to listen to it.
   socket.on("join-room", (roomId, userPointer) => {
+    
     // joining with roomId from front-end (creating a socket room)
     let room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
     if (room == undefined) {
@@ -277,6 +278,8 @@ io.on("connection", socket => {
         email: user.email,
       })
     });
+    room = rooms.find(o => o.id === roomId);
+    io.sockets.in(roomId).emit('sfu-user-update', room.tracks);
     io.sockets.in(roomId).emit('connected-users-list', connectedUsers);
     socket.to(roomId).broadcast.emit("user-connected", connectedUsers, socket.id);
     socket.on('message', (message, whoSentID) => {
@@ -301,6 +304,8 @@ io.on("connection", socket => {
     })
 
     socket.on("disconnect", reason => {
+      room = rooms.find(o => o.id === roomId);
+      io.sockets.in(roomId).emit('sfu-user-update', room.tracks);
       for (var i = 0; i < rooms.length; i++) {
         for (var j = 0; j < rooms[i].connected.length; j++) {
           if (rooms[i].connected[j].socketID == socket.id) {
