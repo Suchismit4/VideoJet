@@ -37,7 +37,7 @@ const updateVideos = () => {
       root.style.setProperty("--vidWidth", '48%')
   } else if (numUsers > 2 && numUsers < 4) {
       root.style.setProperty("--vidWidth", '30%')
-  } else if (numUsers > 5 && numUsers < 7) {
+  } else if (numUsers > 3 && numUsers < 7) {
       root.style.setProperty("--vidWidth", '28%')
   } else if (numUsers > 6) {
       root.style.setProperty("--vidWidth", '18%')
