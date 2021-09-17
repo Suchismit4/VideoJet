@@ -3,6 +3,8 @@ const videoGrid = document.getElementById("video-grid");
 const signalLocal = new Signal.IonSFUJSONRPCSignal(serverURL);
 const clientLocal = new IonSDK.Client(signalLocal, {});
 
+let myVideoPublished = false;
+
 // Event listeners
 signalLocal.onopen = async () => {
     clientLocal.join(ROOM_ID, USER_POINTER).then(() => {
@@ -10,7 +12,6 @@ signalLocal.onopen = async () => {
     });
 }
 clientLocal.ontrack = (track, stream) => {
-    console.log(stream)
     let videoEl = document.createElement('video');
     console.log("[SFU]:   Got stream (track): ", track.id, "for stream: ", stream.id);
     if (track.kind == 'video') {
@@ -57,6 +58,7 @@ const StartStreaming = () => {
         audio: true,
         codec: "vp8",
     }).then((media) => {
+        socket.emit('sfu-user-connected', USER_POINTER, media.id, ROOM_ID);
         videoEl.srcObject = media;
         videoEl.autoplay = true;
         videoEl.controls = false;
@@ -70,7 +72,7 @@ const StartStreaming = () => {
         nameTag.append(info)
         wrapper.append(nameTag)
         videoGrid.append(wrapper);
-        clientLocal.publish(media);
+        clientLocal.publish(media)
         console.log("[SFU]:   Published local stream..");
         updateVideos();
     }).catch(console.error);

@@ -298,3 +298,7 @@ const leaveMeeting = () => {
 //   socket.close();
 // });
 
+
+socket.on('sfu-user-update', (data) => {
+  console.log(data);
+})
