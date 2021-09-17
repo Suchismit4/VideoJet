@@ -45,12 +45,12 @@ const updateVideos = () => {
 }
 
 socket.emit("join-room", ROOM_ID, USER_POINTER);
+
 socket.on('connected-users-list', (connectedUsers) => {
-  console.log(connectedUsers);
   allConnectedInRoom = connectedUsers;
 })
+
 socket.on("user-connected", (connectedUsers, socketIDConnect) => {
-  console.log(connectedUsers)
   allConnectedInRoom = connectedUsers;
 });
 
