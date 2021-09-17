@@ -294,26 +294,13 @@ io.on("connection", socket => {
     })
 
     socket.on('sfu-user-connected', (user_id, media_id, room_id) => {
-      console.log(user_id, room_id, media_id)
       room = rooms.find(o => o.id === room_id);
       const media = room.tracks.find(o => o.media_id == media_id);
-      if(media == undefined) room.tracks.push({media_id: media_id, user_id: user_id})
+      if (media == undefined) room.tracks.push({ media_id: media_id, user_id: user_id })
       io.sockets.in(room_id).emit('sfu-user-update', room.tracks);
     })
 
     socket.on("disconnect", reason => {
-      const _connectedUsers = room.connected;
-      let connectedUsers = [];
-      _connectedUsers.forEach(element => {
-        const user = users.find(o => o.id == element.userPointer);
-        connectedUsers.push({
-          id: user.id,
-          f_name: user.f_name,
-          l_name: user.l_name,
-          email: user.email,
-        })
-      });
-      io.to(roomId).emit("userDisconnected", userPointer, connectedUsers);
       for (var i = 0; i < rooms.length; i++) {
         for (var j = 0; j < rooms[i].connected.length; j++) {
           if (rooms[i].connected[j].socketID == socket.id) {
@@ -337,7 +324,19 @@ io.on("connection", socket => {
           started_meetings.splice(index, 1);
         }
       }
-
+      room = rooms.find(o => o.id == roomId)
+      const _connectedUsers = room.connected;
+      let connectedUsers = [];
+      _connectedUsers.forEach(element => {
+        const user = users.find(o => o.id == element.userPointer);
+        connectedUsers.push({
+          id: user.id,
+          f_name: user.f_name,
+          l_name: user.l_name,
+          email: user.email,
+        })
+      });
+      io.to(roomId).emit("userDisconnected", userPointer, connectedUsers);
     });
   });
 
