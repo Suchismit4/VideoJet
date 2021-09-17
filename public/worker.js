@@ -11,7 +11,10 @@ signalLocal.onopen = async () => {
         console.log("[SFU]:   Joined room successfully")
     });
 }
+
+// @Listen event: ontrack
 clientLocal.ontrack = (track, stream) => {
+    // stream id => media id
     let videoEl = document.createElement('video');
     console.log("[SFU]:   Got stream (track): ", track.id, "for stream: ", stream.id);
     if (track.kind == 'video') {
@@ -21,7 +24,7 @@ clientLocal.ontrack = (track, stream) => {
             videoEl.autoplay = true;
             videoEl.muted = false;
             let wrapper = document.createElement("div")
-            wrapper.id = track.id;
+            wrapper.id = track.id; // track id
             wrapper.classList.add("video-wrapper")
             wrapper.append(videoEl)
             let nameTag = document.createElement('div')

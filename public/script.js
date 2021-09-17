@@ -3,6 +3,7 @@ const socket = io("/");
 // const myVideo = document.createElement("video");
 // const connectedPeers = {}
 let allConnectedInRoom = [];
+let mediaTracks = [];
 const root = document.documentElement
 // myVideo.muted = true;
 // let myUser = {
@@ -300,5 +301,5 @@ const leaveMeeting = () => {
 
 
 socket.on('sfu-user-update', (data) => {
-  console.log(data);
+  mediaTracks = data
 })
