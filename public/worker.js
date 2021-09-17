@@ -29,7 +29,8 @@ clientLocal.ontrack = (track, stream) => {
             wrapper.append(videoEl)
             let nameTag = document.createElement('div')
             nameTag.classList.add('name-tag')
-            const info = document.createTextNode(`Ribu pls gib name`)
+            const info = document.createTextNode(`{name}`)
+            nameTag.setAttribute('data-id', stream.id);
             nameTag.append(info)
             wrapper.append(nameTag)
             videoGrid.append(wrapper);
@@ -70,11 +71,12 @@ const StartStreaming = () => {
         wrapper.classList.add("video-wrapper")
         wrapper.append(videoEl)
         let nameTag = document.createElement('div')
-        nameTag.classList.add('name-tag')
-        const info = document.createTextNode(`Ribu pls gib name`)
+        nameTag.classList.add('name-tag-mine')
+        const info = document.createTextNode(F_NAME + " " + L_NAME);
         nameTag.append(info)
         wrapper.append(nameTag)
         videoGrid.append(wrapper);
+        MY_MEDIA_STREAM = media.id;
         clientLocal.publish(media)
         console.log("[SFU]:   Published local stream..");
         updateVideos();

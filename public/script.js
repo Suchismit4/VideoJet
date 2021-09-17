@@ -4,6 +4,7 @@ const socket = io("/");
 // const connectedPeers = {}
 let allConnectedInRoom = [];
 let mediaTracks = [];
+let MY_MEDIA_STREAM = null;
 const root = document.documentElement
 // myVideo.muted = true;
 // let myUser = {
@@ -33,15 +34,15 @@ const root = document.documentElement
 const updateVideos = () => {
   let numUsers = allConnectedInRoom.length;
   if (numUsers == 1) {
-      root.style.setProperty("--vidWidth", '100%')
+    root.style.setProperty("--vidWidth", '100%')
   } else if (numUsers > 1 && numUsers < 3) {
-      root.style.setProperty("--vidWidth", '48%')
+    root.style.setProperty("--vidWidth", '48%')
   } else if (numUsers > 2 && numUsers < 4) {
-      root.style.setProperty("--vidWidth", '30%')
+    root.style.setProperty("--vidWidth", '30%')
   } else if (numUsers > 3 && numUsers < 7) {
-      root.style.setProperty("--vidWidth", '28%')
+    root.style.setProperty("--vidWidth", '28%')
   } else if (numUsers > 6) {
-      root.style.setProperty("--vidWidth", '18%')
+    root.style.setProperty("--vidWidth", '18%')
   }
 }
 
@@ -301,5 +302,19 @@ const leaveMeeting = () => {
 
 
 socket.on('sfu-user-update', (data) => {
-  mediaTracks = data
+  mediaTracks = data;
+  SetAllNamesInMeeting(data);
 })
+
+function SetAllNamesInMeeting(data) {
+  mediaTracks = data;
+  setTimeout(function () {
+    $('.name-tag').each(function (i, obj) {
+      var name_tag = $(obj).attr( 'data-id' );
+      var mediaTrack = mediaTracks.find(m => m.media_id == name_tag);
+      var user = undefined;
+      if(mediaTrack != undefined) user = allConnectedInRoom.find(u => u.id == mediaTrack.user_id);
+      if(user != undefined) $(obj).text(user.f_name + " " + user.l_name)
+    });
+  }, 500);
+}
