@@ -17,7 +17,7 @@ p, h1, h2, h3, h4, h5, h6, a, span {
 @media (orientation: landscape) {
     
     video {
-        width: 100%;
+        height: 100%;
     }
 }
 
@@ -38,6 +38,7 @@ p, h1, h2, h3, h4, h5, h6, a, span {
     align-items:  center;
     background-color: #242424;
     border-radius: 10px;
+    overflow-x: hidden;
 }
 
 body {
