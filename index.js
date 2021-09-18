@@ -190,8 +190,8 @@ app.post('/join/meeting', CheckAuth, (req, res) => {
 
 // getting the uuid room route
 app.get("/meeting/:room", CheckAuth, (req, res) => {
-  let meeting = started_meetings.find(o => o.key === req.params.room);
-  if (meeting == undefined) res.redirect('/');
+  let meeting = started_meetings.find(o => o.key == req.params.room);
+  if (meeting == undefined) res.redirect('/')
   else {
     if (meeting.users.includes(req.user.id)) {
       res.render("room", { roomId: req.params.room, id_user: req.user.id, f_name: req.user.f_name, l_name: req.user.l_name });
@@ -230,6 +230,12 @@ app.get('/school/:schoolID/classroom', (req, res) => {
     End of Class room routes
 
 */
+
+app.get('/dev', CheckAuth, (req, res) => {
+  if(req.user.type === "admin")
+    res.render('dev.ejs')
+  else res.sendStatus(100)
+})
 
 // when a new user connects to our network
 io.on("connection", socket => {
