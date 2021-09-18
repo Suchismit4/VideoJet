@@ -87,6 +87,12 @@ app.post('/user/login', CheckNotAuth, passport.authenticate('local', {
   failureFlash: true
 }));
 
+//get request to handle new class creation for teacher
+app.get('/teacher/create-meeting', CheckAuth, (req, res) => {
+  if(req.user.type == "student") return res.redirect('/');
+  res.render('create-meeting.ejs')
+}); 
+
 // get request to handle displaying register
 app.get('/admin/register', CheckAuth, (req, res) => {
   if (req.user.type != "admin") return res.redirect('/');
