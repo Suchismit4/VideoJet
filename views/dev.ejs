@@ -9,35 +9,15 @@
     <script src="https://unpkg.com/ion-sdk-js@1.5.5/dist/ion-sdk.min.js"></script>
     <script src="https://unpkg.com/ion-sdk-js@1.5.5/dist/json-rpc.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-    <script src="../socket.io/socket.io.js"></script>
+    <!-- <script src="../socket.io/socket.io.js"></script> -->
     <script src="https://kit.fontawesome.com/1fbc7a0c23.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/opus-media-recorder@latest/OpusMediaRecorder.umd.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/opus-media-recorder@latest/encoderWorker.umd.js"></script>
-	<!-- SFMediaStream -->
-    <script>
-        const ROOM_ID = "<%= roomId %>";
-        const USER_POINTER = "<%= id_user %>";
-        const F_NAME = "<%= f_name %>"
-        const L_NAME = "<%= l_name %>"
-    </script>
 </head>
 <body>
-    <div class="alert-pop-up-join-audio" id="--flag-imp-important">
-        <div class="container">
-            <div class="row justify-content-center text-center">
-                <h3>You are currently not connected to audio</h3>
-                <p>Click below to connect to audio. Your audio is encrypted then is routed through data centers located and hosted by replit.</p>
-                <button onclick="init(true)">Connect to audio</button>
-            </div>
-        </div>
-    </div>
     <div class="main">
         <div class="main__left">
             <div class="main__videos">
                 <div id="video-grid">
-                    
+                  
                 </div>
             </div>
             <div class="main__controls">
@@ -103,9 +83,4 @@
         </div>
     </div>
 </body>
-<script src="../script.js"></script>
-
-<script src="../helpers/elements.js"></script>
-<!-- Handling video/audio server transimission -->
-<script src="../worker.js"></script>
 </html>
