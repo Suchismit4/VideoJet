@@ -266,9 +266,15 @@ body {
     margin-top: 3px;
 }
 
+.audio-block-content{
+    width: 640px;
+    height: 480px;
+    position: relative;
+}
+
 .audio-block{
-    width: 300px;
-    margin: 3px;
+    width: var(--vidWidth);
+    margin: 10px;
     aspect-ratio: 4/3;
     position: relative;
     display: flex;
