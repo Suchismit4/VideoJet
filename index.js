@@ -89,9 +89,9 @@ app.post('/user/login', CheckNotAuth, passport.authenticate('local', {
 
 //get request to handle new class creation for teacher
 app.get('/teacher/create-meeting', CheckAuth, (req, res) => {
-  if(req.user.type == "student") return res.redirect('/');
+  if (req.user.type == "student") return res.redirect('/');
   res.render('create-meeting.ejs')
-}); 
+});
 
 // get request to handle displaying register
 app.get('/admin/register', CheckAuth, (req, res) => {
@@ -238,7 +238,7 @@ app.get('/school/:schoolID/classroom', (req, res) => {
 */
 
 app.get('/dev', CheckAuth, (req, res) => {
-  if(req.user.type === "admin")
+  if (req.user.type === "admin")
     res.render('dev.ejs')
   else res.sendStatus(100)
 })
@@ -247,7 +247,7 @@ app.get('/dev', CheckAuth, (req, res) => {
 io.on("connection", socket => {
   // when the event 'join-room' is triggered we are to listen to it.
   socket.on("join-room", (roomId, userPointer) => {
-    
+
     // joining with roomId from front-end (creating a socket room)
     let room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
     if (room == undefined) {
@@ -310,8 +310,13 @@ io.on("connection", socket => {
 
     socket.on('sfu-user-connected', (user_id, media_id, room_id) => {
       room = rooms.find(o => o.id === room_id);
-      const media = room.tracks.find(o => o.media_id == media_id);
+      const media = room.tracks.find(o => o.user_id == user_id);
       if (media == undefined) room.tracks.push({ media_id: media_id, user_id: user_id })
+      else {
+        const index = room.tracks.indexOf(media);
+        if (index > -1) rooms[i].connected.splice(j, 1);
+        room.tracks.push({ media_id: media_id, user_id: user_id })
+      }
       io.sockets.in(room_id).emit('sfu-user-update', room.tracks);
     })
 
@@ -359,7 +364,6 @@ io.on("connection", socket => {
 
 });
 
-console.log("Running...");
 
 // Authentication Middleware functions
 
@@ -409,6 +413,7 @@ function isOccupied(userPointer) {
   return false;
 }
 
-server.listen(process.env.PORT || 3030);
+server.listen(process.env.PORT || 3030)
+console.log("Server now running on http://localhost:3030")
 
 // TODO: handle tracks on disconnect
