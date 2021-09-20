@@ -11,6 +11,7 @@ const CreateElement = {
         //                 </div>
         //             </div>
         DOM = document.createElement('div');
+        DOM.setAttribute('data-stream-id', stream.id);
         DOM.classList.add('audio-block');
         DOM.id = track.id;
         let audio_content = document.createElement('div');

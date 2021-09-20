@@ -10,6 +10,7 @@ let inCooldown = false;
 let remoteMedia = null;
 let tasks = [];
 let videoConnected = []
+let audioConnected = []
 
 
 // initialize user
@@ -22,15 +23,15 @@ async function init() {
 }
 
 async function ToggleCamera() {
-    if(inCooldown) return;
+    if (inCooldown) return;
     if (!connectedToServer || !connectedToAudio) return;
-    if(!cameraState){
+    if (!cameraState) {
         SetCooldown();
         remoteMedia.unpublish();
         StartStreaming(true);
         cameraState = true;
         $("#toggleVideoText").text('Disable Video');
-    }else{
+    } else {
         SetCooldown();
         StartStreaming(false);
         cameraState = false;
@@ -47,7 +48,7 @@ signalLocal.onopen = async () => {
 }
 
 const PerformAllTasks = () => {
-    for (var i = tasks.length-1; i >= 0; i--){
+    for (var i = tasks.length - 1; i >= 0; i--) {
         tasks[i].performTask(tasks[i].track, tasks[i].stream);
     }
 }
@@ -60,6 +61,12 @@ clientLocal.ontrack = (track, stream) => {
         console.log("[SFU]:   Got stream (track): ", track.id, "for stream: ", stream.id);
         if (track.kind == 'video') {
             track.onunmute = () => {
+                if (audioConnected.includes(stream.id)) {
+                    // remove the audio block then init
+                    const removeAudio = document.querySelector(`div[data-stream-id='${stream.id}']`)
+                    videoGrid.removeChild(removeAudio);
+                    updateVideos();
+                }
                 videoConnected.push(stream.id);
                 videoEl.controls = false;
                 videoEl.srcObject = stream;
@@ -80,8 +87,10 @@ clientLocal.ontrack = (track, stream) => {
                 stream.onremovetrack = (e) => {
                     console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
                     if (e.track.kind == 'video') {
-                        const index = videoConnected.indexOf(stream.id);
-                        if(index > -1) videoConnected.splice(index, 1);
+                        var index = videoConnected.indexOf(stream.id);
+                        if (index > -1) videoConnected.splice(index, 1);
+                        index = audioConnected.indexOf(stream.id);
+                        if (index > -1) audioConnected.splice(index, 1);
                         const removeVideo = document.getElementById(e.track.id);
                         videoGrid.removeChild(removeVideo);
                         updateVideos();
@@ -89,18 +98,17 @@ clientLocal.ontrack = (track, stream) => {
                 }
             }
         } else if (track.kind == 'audio') {
-            setTimeout(function(){
-                if(videoConnected.includes(stream.id)) return;
-                CreateElement.CreateAudioBlock(track, stream, false);
-                stream.onremovetrack = (e) => {
-                    console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
-                    if (e.track.kind == 'audio') {
-                        const removeVideo = document.getElementById(e.track.id);
-                        videoGrid.removeChild(removeVideo);
-                        updateVideos();
-                    }
+            if (videoConnected.includes(stream.id)) return;
+            CreateElement.CreateAudioBlock(track, stream, false);
+            audioConnected.push(stream.id);
+            stream.onremovetrack = (e) => {
+                console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
+                if (e.track.kind == 'audio') {
+                    const removeVideo = document.getElementById(e.track.id);
+                    videoGrid.removeChild(removeVideo);
+                    updateVideos();
                 }
-            }, 100);
+            }
         }
     }
     if (!connectedToAudio) {
@@ -112,7 +120,13 @@ clientLocal.ontrack = (track, stream) => {
                 console.log("[SFU]:   Got stream (track): ", track.id, "for stream: ", stream.id);
                 if (track.kind == 'video') {
                     track.onunmute = () => {
-                        videoConnected.push(stream.id)
+                        if (audioConnected.includes(stream.id)) {
+                            // remove the audio block then init
+                            const removeAudio = document.querySelector(`div[data-stream-id='${stream.id}']`)
+                            videoGrid.removeChild(removeAudio);
+                            updateVideos();
+                        }
+                        videoConnected.push(stream.id);
                         videoEl.controls = false;
                         videoEl.srcObject = stream;
                         videoEl.autoplay = true;
@@ -132,8 +146,10 @@ clientLocal.ontrack = (track, stream) => {
                         stream.onremovetrack = (e) => {
                             console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
                             if (e.track.kind == 'video') {
-                                const index = videoConnected.indexOf(stream.id);
-                                if(index > -1) videoConnected.splice(index, 1);
+                                var index = videoConnected.indexOf(stream.id);
+                                if (index > -1) videoConnected.splice(index, 1);
+                                index = audioConnected.indexOf(stream.id);
+                                if (index > -1) audioConnected.splice(index, 1);
                                 const removeVideo = document.getElementById(e.track.id);
                                 videoGrid.removeChild(removeVideo);
                                 updateVideos();
@@ -141,18 +157,17 @@ clientLocal.ontrack = (track, stream) => {
                         }
                     }
                 } else if (track.kind == 'audio') {
-                    setTimeout(function(){
-                        if(videoConnected.includes(stream.id)) return;
-                        CreateElement.CreateAudioBlock(track, stream, false);
-                        stream.onremovetrack = (e) => {
-                            console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
-                            if (e.track.kind == 'audio') {
-                                const removeVideo = document.getElementById(e.track.id);
-                                videoGrid.removeChild(removeVideo);
-                                updateVideos();
-                            }
+                    if (videoConnected.includes(stream.id)) return;
+                    CreateElement.CreateAudioBlock(track, stream, false);
+                    audioConnected.push(stream.id);
+                    stream.onremovetrack = (e) => {
+                        console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
+                        if (e.track.kind == 'audio') {
+                            const removeVideo = document.getElementById(e.track.id);
+                            videoGrid.removeChild(removeVideo);
+                            updateVideos();
                         }
-                    }, 100);
+                    }
                 }
             }
         })
@@ -181,8 +196,8 @@ const StartStreaming = (state) => {
 
 const PublishVideo = (media, videoEl) => {
     RemoveNullElements();
-    setTimeout(function(){
-        
+    setTimeout(function () {
+
         videoEl.srcObject = media;
         videoEl.autoplay = true;
         videoEl.controls = false;
@@ -203,7 +218,7 @@ const PublishVideo = (media, videoEl) => {
 
 const PublishAudio = (media) => {
     RemoveNullElements();
-    setTimeout(function (){
+    setTimeout(function () {
         CreateElement.CreateAudioBlock({ id: null }, media, true);
     }, 500);
 }
@@ -215,7 +230,7 @@ const RemoveNullElements = () => {
 
 const SetCooldown = () => {
     inCooldown = true;
-    setTimeout(function(){
+    setTimeout(function () {
         inCooldown = false;
     }, 5000);
 }

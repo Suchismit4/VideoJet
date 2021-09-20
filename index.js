@@ -314,7 +314,7 @@ io.on("connection", socket => {
       if (media == undefined) room.tracks.push({ media_id: media_id, user_id: user_id })
       else {
         const index = room.tracks.indexOf(media);
-        if (index > -1) rooms[i].connected.splice(j, 1);
+        if (index > -1) room.tracks.splice(index, 1);
         room.tracks.push({ media_id: media_id, user_id: user_id })
       }
       io.sockets.in(room_id).emit('sfu-user-update', room.tracks);
