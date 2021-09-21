@@ -1,18 +1,12 @@
 let elementCount = 99999;
-const _videoGrid = document.getElementById("video-grid");
+const _videoGrid = document.getElementById("--video-grid");
 
 const CreateElement = {
     CreateAudioBlock: (track, stream, muted) => {
         elementCount++;
-        // structure: 
-        // <div class="audio-block" id="${track.id}">
-        //                 <div class="audio-block-content">
-        //                     <div class="pfp"></div>
-        //                 </div>
-        //             </div>
         DOM = document.createElement('div');
         DOM.setAttribute('data-stream-id', stream.id);
-        DOM.classList.add('audio-block');
+        DOM.classList.add('box-container');
         DOM.id = track.id;
         let audio_content = document.createElement('div');
         audio_content.classList.add('audio-block-content');
