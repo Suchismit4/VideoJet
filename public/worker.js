@@ -1,5 +1,5 @@
 const serverURL = "wss://zoomclone.ga/ws";
-const videoGrid = document.getElementById("video-grid");
+const videoGrid = document.getElementById("--video-grid");
 let signalLocal = new Signal.IonSFUJSONRPCSignal(serverURL);
 let clientLocal = new IonSDK.Client(signalLocal, {});
 let connectedToAudio = false;
@@ -74,14 +74,14 @@ clientLocal.ontrack = (track, stream) => {
                 videoEl.muted = false;
                 let wrapper = document.createElement("div")
                 wrapper.id = track.id; // track id
-                wrapper.classList.add("video-wrapper")
+                wrapper.classList.add("box-container")
                 wrapper.append(videoEl)
-                let nameTag = document.createElement('div')
-                nameTag.classList.add('name-tag')
-                const info = document.createTextNode(`{name}`)
-                nameTag.setAttribute('data-id', stream.id);
-                nameTag.append(info)
-                wrapper.append(nameTag)
+                // let nameTag = document.createElement('div')
+                // nameTag.classList.add('name-tag')
+                // const info = document.createTextNode(`{name}`)
+                // nameTag.setAttribute('data-id', stream.id);
+                // nameTag.append(info)
+                // wrapper.append(nameTag)
                 videoGrid.append(wrapper);
                 updateVideos();
                 stream.onremovetrack = (e) => {
@@ -133,14 +133,14 @@ clientLocal.ontrack = (track, stream) => {
                         videoEl.muted = false;
                         let wrapper = document.createElement("div")
                         wrapper.id = track.id; // track id
-                        wrapper.classList.add("video-wrapper")
+                        wrapper.classList.add("box-container")
                         wrapper.append(videoEl)
-                        let nameTag = document.createElement('div')
-                        nameTag.classList.add('name-tag')
-                        const info = document.createTextNode(`{name}`)
-                        nameTag.setAttribute('data-id', stream.id);
-                        nameTag.append(info)
-                        wrapper.append(nameTag)
+                        // let nameTag = document.createElement('div')
+                        // nameTag.classList.add('name-tag')
+                        // const info = document.createTextNode(`{name}`)
+                        // nameTag.setAttribute('data-id', stream.id);
+                        // nameTag.append(info)
+                        // wrapper.append(nameTag)
                         videoGrid.append(wrapper);
                         updateVideos();
                         stream.onremovetrack = (e) => {
@@ -197,20 +197,19 @@ const StartStreaming = (state) => {
 const PublishVideo = (media, videoEl) => {
     RemoveNullElements();
     setTimeout(function () {
-
         videoEl.srcObject = media;
         videoEl.autoplay = true;
         videoEl.controls = false;
         videoEl.muted = true;
         let wrapper = document.createElement("div")
-        wrapper.classList.add("video-wrapper")
+        wrapper.classList.add("box-container")
         wrapper.id = null;
         wrapper.append(videoEl)
-        let nameTag = document.createElement('div')
-        nameTag.classList.add('name-tag-mine')
-        const info = document.createTextNode(F_NAME + " " + L_NAME);
-        nameTag.append(info)
-        wrapper.append(nameTag)
+        // let nameTag = document.createElement('div')
+        // nameTag.classList.add('name-tag-mine')
+        // const info = document.createTextNode(F_NAME + " " + L_NAME);
+        // nameTag.append(info)
+        // wrapper.append(nameTag)
         videoGrid.append(wrapper);
     }, 500)
 

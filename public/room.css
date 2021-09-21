@@ -1,0 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+p, h1, h2, h3, h4, h5, h6, a, span {
+    font-family: 'Montserrat', sans-serif;
+}
+
+:root {
+    --vidWidth: 100%;
+}
+
+body, html {
+    background: #232b35;
+    max-height: 100vh;
+}
+
+.main__container {
+    background: #232b35;
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+}
+
+#video-grid {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 100%;
+}
+
+.box-container {
+    width: 27% !important;
+    aspect-ratio: 4/3 !important;
+    background: #36404B !important;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-sizing: border-box;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    padding: 0px !important;
+}
+
+.box-container>div.info-user {
+    position: absolute;
+    width: 181px;
+    height: 250px;
+    right: 15px;
+    top: 15px;
+    border-radius: 15px;
+    z-index: 98;
+    background: inherit;
+    overflow: hidden;
+    padding: 22px 20px;
+}
+
+div.info-user p {
+    position: relative;
+    z-index: 99;
+    margin: 0;
+}
+
+div.info-user p.username {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 122.4%;
+    /* identical to box height, or 21px */
+    letter-spacing: 0.01em;
+    color: #000;
+    margin-bottom: 7px;
+}
+
+div.info-user p.detail {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: normal;
+    /* or 12px */
+    margin-bottom: 2px;
+    letter-spacing: 0.01em;
+    color: #000000;
+}
+
+.box-container>div.info-user:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: inset 0 0 2000px rgba(255, 255, 255, .5);
+    filter: blur(10px);
+    background: inherit;
+    margin: -20px;
+}
+
+.box-container div.info-user img {
+    width: 16px !important;
+}
+
+#volume {
+    position: absolute;
+    margin: 0 auto;
+    height: 3px;
+    width: 100px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    margin-left: 30px;
+    margin-top: -11.5px;
+    z-index: 99 !important;
+}
+
+#volume .ui-slider-range-min {
+    height: 3px;
+    width: 300px;
+    position: absolute;
+    background: #000;
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+}
+
+#volume .ui-slider-handle {
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    background: #000;
+    position: absolute;
+    margin-left: -8px;
+    margin-top: -9px;
+    cursor: pointer;
+    outline: none;
+    scale: 0.5;
+}
+
+#main__sidebar {
+    margin: 0;
+    border-radius: 0px 30px 30px 0px;
+    height: 92vh;
+    width: 100px;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    overflow: hidden;
+    z-index: 99 !important;
+    background: rgba(54, 64, 75, 0.6);
+    box-shadow: -1px 0px 12px rgba(0, 0, 0, 0.25);
+    border-radius: 0px 30px 30px 0px;
+    padding-top: 35px;
+    padding-bottom: 30px;
+}
+
+#myUser {
+    padding-left: 5px;
+}
+
+#myUser img {
+    width: 60px;
+    border-radius: 200px;
+    height: 60px;
+}
+
+#main__sidebar .divider {
+    width: 60px;
+    margin-left: 5.5px;
+    height: 4px;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 200px;
+}
+
+.control {
+    width: fit-content;
+    width: -moz-fit-content;
+    margin-top: 25px;
+    margin-left: 16px;
+    margin-bottom: 30px !important;
+    cursor: pointer;
+}
+
+.control i {
+    font-size: 30px;
+    color: #ddd;
+}
+
+div.exit {
+    position: absolute;
+    bottom: 28px;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+div.exit p {
+    font-family: Montserrat;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18.5px;
+    line-height: 122.4%;
+    /* or 26px */
+    letter-spacing: 0.01em;
+    color: #E74C3C;
+    width: fit-content;
+}
+
+div.exit p i {
+    font-size: 15px;
+    width: fit-content;
+    color: #C0392B;
+    -moz-transform: scale(-1, -1);
+    -o-transform: scale(-1, -1);
+    -webkit-transform: scale(-1, -1);
+    transform: scale(-1, -1);
+}
+
+.alert-pop-up-join-audio {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 358px;
+    height: 215px;
+    padding: 25px;
+    border-radius: 7px;
+    background: #FFF;
+    z-index: 99;
+}
+
+.alert-pop-up-join-audio h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 19px;
+    color: #000;
+    font-weight: 600;
+}
+
+.alert-pop-up-join-audio p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.7);
+    font-weight: 300;
+    margin-top: 6px;
+}
+
+.alert-pop-up-join-audio button {
+    background-color: #2d8cff;
+    border: none;
+    box-shadow: none;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    width: fit-content !important;
+    width: -moz-fit-content !important;
+    color: #ecf0f1;
+    margin-top: 3px;
+}
+
+.box-container video {
+    position: absolute;
+    height: 100%;
+    margin: 0px;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
