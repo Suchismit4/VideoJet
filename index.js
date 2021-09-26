@@ -294,6 +294,15 @@ io.on("connection", socket => {
     io.sockets.in(roomId).emit('sfu-user-update', room.tracks);
     io.sockets.in(roomId).emit('connected-users-list', connectedUsers);
     socket.to(roomId).broadcast.emit("user-connected", connectedUsers, socket.id);
+    
+    socket.on('user-videoOff', (remoteMediaID) => {
+      socket.to(roomId).broadcast.emit('user-videoOff', remoteMediaID);
+    })
+
+    socket.on('user-videoOn', (remoteMediaID) => {
+      socket.to(roomId).broadcast.emit('user-videoOn', remoteMediaID);
+    })
+
     socket.on('message', (message, whoSentID) => {
       const user = users.find(o => o.id == whoSentID);
       const name = user.f_name;
