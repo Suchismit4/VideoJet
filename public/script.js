@@ -69,6 +69,16 @@ socket.on('userDisconnected', (userID, connectedUsers) => {
   updateVideos()
 })
 
+socket.on('user-videoOff', (remoteID) => {
+  if(remoteMedia == null) return;
+  document.getElementById(remoteID).classList.add('d-none');
+})
+
+socket.on('user-videoOn', (remoteID) => {
+  if(remoteMedia == null) return;
+  document.getElementById(remoteID).classList.remove('d-none');
+})
+
 /*
   [DEPRECATED]:   Moved on to Ion-SFU
 */
