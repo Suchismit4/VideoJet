@@ -274,3 +274,7 @@ div.exit p i {
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
+
+.muted{
+    border: 4px solid #e74c3c !important; 
+}

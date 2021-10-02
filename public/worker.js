@@ -32,16 +32,18 @@ async function init() {
             $("#--flag-imp-important").addClass('d-none')
             StartStreaming(true);
             connectedToAudio = true;
-            PerformAllTasks();
-            cameraState = true;
+            if (i < tasks.length) {
+                PerformAllTasks();
+            } cameraState = true;
             webCamStatus = true;
         } else {
             alert("No web cam was detected..\n\nProceed to connect with only audio?");
             $("#web_cam_button").addClass('d-none');
             StartStreaming(false);
             connectedToAudio = true;
-            PerformAllTasks();
-            webCamStatus = false;
+            if (i < tasks.length) {
+                PerformAllTasks();
+            } webCamStatus = false;
             $("#can-state").css('color', 'yellow');
         }
         successInit = true;
@@ -80,13 +82,13 @@ signalLocal.onopen = async () => {
 }
 
 var i = 0;
-function PerformAllTasks() {  
-    setTimeout(function () {  
+function PerformAllTasks() {
+    setTimeout(function () {
         tasks[i].performTask(tasks[i].track, tasks[i].stream);
-        i++;                   
-        if (i < tasks.length) {           
-            PerformAllTasks();            
-        }                    
+        i++;
+        if (i < tasks.length) {
+            PerformAllTasks();
+        }
     }, 100)
 }
 
@@ -114,6 +116,7 @@ clientLocal.ontrack = (track, stream) => {
             wrapper.classList.add("box-container")
             wrapper.append(videoEl)
             videoGrid.append(wrapper);
+            wrapper.setAttribute("data-stream-id", stream.id)
             updateVideos();
             stream.onremovetrack = (e) => {
                 console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
@@ -168,6 +171,8 @@ clientLocal.ontrack = (track, stream) => {
                     wrapper.classList.add("box-container")
                     wrapper.append(videoEl)
                     videoGrid.append(wrapper);
+                    wrapper.setAttribute("data-stream-id", stream.id)
+
                     updateVideos();
                     stream.onremovetrack = (e) => {
                         console.log("[SFU]:   Removing stream (track): ", track.id, "for stream: ", stream.id);
@@ -260,16 +265,18 @@ const SetCooldown = (cooldown) => {
 
 function ToggleMute() {
     if (muted) {
-        console.log('trying to unmute...')
         remoteMedia.getAudioTracks().forEach(element => {
             element.enabled = true;
         });
+        socket.emit('user-unmute', remoteMedia.id);
         $("#muted-state").css('color', 'green');
         muted = false;
     } else {
         remoteMedia.getAudioTracks().forEach(element => {
             element.enabled = false;
-        }); $("#muted-state").css('color', 'red');
+        });
+        socket.emit('user-mute', remoteMedia.id);
+        $("#muted-state").css('color', 'red');
         muted = true;
     }
 }
