@@ -200,7 +200,7 @@ app.get("/meeting/:room", CheckAuth, (req, res) => {
   if (meeting == undefined) res.redirect('/')
   else {
     if (meeting.users.includes(req.user.id)) {
-      res.render("new_room", { roomId: req.params.room, id_user: req.user.id, f_name: req.user.f_name, l_name: req.user.l_name });
+      res.render("room", { roomId: req.params.room, id_user: req.user.id, f_name: req.user.f_name, l_name: req.user.l_name });
     } else return res.redirect('/err');
   }
 });
@@ -295,6 +295,10 @@ io.on("connection", socket => {
     io.sockets.in(roomId).emit('connected-users-list', connectedUsers);
     socket.to(roomId).broadcast.emit("user-connected", connectedUsers, socket.id);
     
+    socket.on('user-mute', (remoteMedia) =>  socket.to(roomId).broadcast.emit('user-mute', remoteMedia));
+    socket.on('user-unmute', (remoteMedia) =>  socket.to(roomId).broadcast.emit('user-unmute', remoteMedia));
+
+
     socket.on('user-videoOff', (remoteMediaID) => {
       socket.to(roomId).broadcast.emit('user-videoOff', remoteMediaID);
     })

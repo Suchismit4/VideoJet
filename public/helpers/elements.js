@@ -22,6 +22,8 @@ const CreateElement = {
         audio_content.appendChild(sound);
         updateVideos();
         return true;
+
+        
     }
 
 }

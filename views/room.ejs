@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zoom Clone</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../room.css">
     <script src="https://unpkg.com/ion-sdk-js@1.5.5/dist/ion-sdk.min.js"></script>
     <script src="https://unpkg.com/ion-sdk-js@1.5.5/dist/json-rpc.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
@@ -23,6 +24,7 @@
         const L_NAME = "<%= l_name %>"
     </script>
 </head>
+
 <body>
     <div class="alert-pop-up-join-audio" id="--flag-imp-important">
         <div class="container">
@@ -33,79 +35,74 @@
             </div>
         </div>
     </div>
-    <div class="main">
-        <div class="main__left">
-            <div class="main__videos">
-                <div id="video-grid">
-                    
+    <div class="main__container">
+        <div id="main__sidebar">
+            <div class="container-fluid">
+                <div id="myUser">
+                    <img src="../img/pfp.jpg" alt="">
                 </div>
-            </div>
-            <div class="main__controls">
-                <div class="main__controls__block">
-                    <div class="main__controls__button mute__button" onclick="toggleMute()">
-                        <i class="fas fa-microphone mute"></i>
-                        <span>Mute</span>
-                    </div>
-                    <div class="main__controls__button video__button" onclick="ToggleCamera()">
-                        <i class="fas fa-video mute"></i>
-                        <span id="toggleVideoText">Enable Video</span>
-                    </div>
+                <div class="divider"></div>
+                <div class="control"> <i style="padding-left: 4px;" class="fas fa-user"></i>
                 </div>
-
-                <div class="main__controls__block">
-                    <div class="main__controls__button">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Security</span>
-                    </div>
-                    <div class="main__controls__button" onclick="toggleParticipants()">
-                        <i class="fas fa-users"></i>
-                        <span>Participants</span>
-                    </div>
-                    <div class="main__controls__button" onclick="toggleChat()">
-                        <i class="fas fa-comment-alt"></i>
-                        <span>Chat</span>
-                    </div>
+                <div class="control"> <i style="padding-left: 2px;" class="fas fa-comment-alt"></i>
                 </div>
-
-                <div class="main__controls__block">
-                    <div class="main__controls__button leave__button" onclick="leaveMeeting()">
-                        <span class="leave__meeting">Leave Meeting</span>
-                    </div>
+                <div class="control" style="margin-left: 12px;"> <img style="width: 40.9090909091px; height: 22.7272727273px;"
+                        src="../img/ic_round-screen-share.png" alt="">
+                </div>
+                <div class="control" onclick="ToggleMute();"> <i style="padding-left: 7px; color: green;" id="muted-state" class="fas fa-microphone"></i>
+                </div>
+                <div class="control" id="web_cam_button" onclick="ToggleCamera()"> <i id="cam-state" class="fas fa-video-slash"></i>
+                </div>
+                <div class="control"> <img style="width: 30px; height: 30px;" src="../img/sticker.png" alt="">
+                </div>
+                <div class="divider"></div>
+                <div class="exit">
+                    <p><i class="fas fa-sign-out-alt"></i> Exit</p>
                 </div>
             </div>
         </div>
-        <div class="main__right">
-            <div id="chat" class="d-none">
-                <div class="main__header">
-                    <h6>Chat</h6>
-                </div>
-                <div class="main__chat__window">
-                    <ul class="messages">
-
-                    </ul>
-                </div>
-                <div class="main__message__container">
-                    <input type="text" id="chat_message" placeholder="Type message here...">
-                </div>
-            </div>
-
-            <div id="participant__list" class="d-none">
-                <div class="main__header">
-                    <h6>Participants</h6>
-                </div>
-                <div class="main__participants__window">
-                    <ul class="participants">
-
-                    </ul>
+        <div id="video-grid">
+            <div class="container-fluid">
+                <div class="row justify-content-center" id="--video-grid">
+                    <!-- <div class="box-container">
+                         <div class="info-user">
+                            <p class="username">Stella Dey</p>
+                            <p class="detail">2004/2019</p>
+                            <p class="detail">stellaiam@gmail.com</p>
+                            <p class="detail">+91 999 9999 999</p>
+                            <p class="volume-control"><img src="../img/volume.png" alt=""></p>
+                            <div id="volume"></div>
+                        </div> 
+                    </div> -->
                 </div>
             </div>
-
         </div>
     </div>
 </body>
+
 <script src="../script.js"></script>
 
 <script src="../helpers/elements.js"></script>
 <!-- Handling video/audio server transimission -->
 <script src="../worker.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script>
+    $("#volume").slider({
+        min: 0,
+        max: 100,
+        value: 0,
+        range: "min",
+        slide: function (event, ui) {
+            setVolume(ui.value / 100);
+        }
+    });
+
+    function setVolume(myVolume) {
+
+    }
+</script>
+
 </html>
