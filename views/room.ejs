@@ -22,6 +22,7 @@
         const USER_POINTER = "<%= id_user %>";
         const F_NAME = "<%= f_name %>"
         const L_NAME = "<%= l_name %>"
+        const MY_EMAIL = "<%= email %>";
     </script>
 </head>
 
@@ -64,16 +65,6 @@
         <div id="video-grid">
             <div class="container-fluid">
                 <div class="row justify-content-center" id="--video-grid">
-                    <!-- <div class="box-container">
-                         <div class="info-user">
-                            <p class="username">Stella Dey</p>
-                            <p class="detail">2004/2019</p>
-                            <p class="detail">stellaiam@gmail.com</p>
-                            <p class="detail">+91 999 9999 999</p>
-                            <p class="volume-control"><img src="../img/volume.png" alt=""></p>
-                            <div id="volume"></div>
-                        </div> 
-                    </div> -->
                 </div>
             </div>
         </div>
@@ -90,19 +81,7 @@
     integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script>
-    $("#volume").slider({
-        min: 0,
-        max: 100,
-        value: 0,
-        range: "min",
-        slide: function (event, ui) {
-            setVolume(ui.value / 100);
-        }
-    });
-
-    function setVolume(myVolume) {
-
-    }
+    
 </script>
 
 </html>

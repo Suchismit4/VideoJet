@@ -236,9 +236,24 @@ const PublishVideo = (media, videoEl) => {
         videoEl.id = media.id;
         let wrapper = document.createElement("div")
         wrapper.classList.add("box-container")
+        wrapper.innerHTML += `<div class="info-user">
+        <p class="username">${F_NAME} ${L_NAME}</p>
+        <p class="detail">XXXX/XXXX</p>
+        <p class="detail">${MY_EMAIL}</p>
+        <p class="detail">+91 XXX XXXX XXX</p>
+    </div> `
         wrapper.id = null;
         wrapper.append(videoEl)
         videoGrid.append(wrapper);
+        $("#volume").slider({
+            min: 0,
+            max: 100,
+            value: 0,
+            range: "min",
+            slide: function (event, ui) {
+                setVolume(ui.value / 100);
+            }
+        });
     }, 500)
 
 }
