@@ -152,6 +152,35 @@ div.info-user p.detail {
     border-radius: 0px 30px 30px 0px;
     padding-top: 35px;
     padding-bottom: 30px;
+    left: -10%;
+}
+
+.slide-in {
+    animation: slide-in 1s forwards;
+    -webkit-animation: slide-in 1s forwards;
+}
+
+@keyframes slide-in {
+    100% { left: 0%; }
+}
+
+@-webkit-keyframes slide-in {
+    100% { left: 0%; }
+}
+
+.slide-out {
+    animation: slide-out 1s forwards;
+    -webkit-animation: slide-out 1s forwards;
+}
+
+@keyframes slide-out {
+    0% { left: 0%; }
+    100% { left: -10%; }
+}
+
+@-webkit-keyframes slide-out {
+    0% { left: 0%; }
+    100% { left: -10%; }
 }
 
 #myUser {

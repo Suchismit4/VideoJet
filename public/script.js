@@ -109,3 +109,34 @@ socket.on('user-mute', (mediaID) => {
   const user = document.querySelector(`div[data-stream-id='${mediaID}']`)
   user.classList.add('muted');
 })
+
+let isPanelVisible = false;
+var sidepanel = document.getElementById("main__sidebar");
+var lastX = -1;
+var lastY = -1;
+var pointerX = -1;
+var pointerY = -1;
+document.onmousemove = function(event) {
+	pointerX = event.pageX;
+	pointerY = event.pageY;
+}
+setInterval(pointerCheck, 500);
+function pointerCheck() {
+	if((pointerX == lastX && pointerY == lastY)) return;
+  else{
+    lastX = pointerX;
+    lastY = pointerY;
+    if(pointerX <= 170){
+      if(!isPanelVisible){
+        sidepanel.setAttribute('class', 'slide-in');
+        isPanelVisible = true;
+      }
+    }else if(pointerX > 170){
+      if(isPanelVisible){
+        sidepanel.setAttribute('class', 'slide-out');
+        isPanelVisible = false;
+      }
+      
+    }
+  }
+}
