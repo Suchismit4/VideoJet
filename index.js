@@ -1,6 +1,5 @@
 // REMINDER: TODO Fix meeting check method to check if a meeting is valid but not started. Implement waiting room.
 // TODO: Fix idk what is broken socket emits to sender.
-
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
@@ -11,10 +10,14 @@ const bodyParser = require("body-parser");
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
 const fs = require('fs');
-const { v4: uuidv4 } = require("uuid");
+const {
+  v4: uuidv4
+} = require("uuid");
 const utils = require('./utils.js')
 const ClassManager = require('./Managers/ClassManager.js')
-const { ExpressPeerServer } = require("peer");
+const {
+  ExpressPeerServer
+} = require("peer");
 
 // importing essentials for login system
 const bcrypt = require('bcrypt');
@@ -27,9 +30,15 @@ const {
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 const initializePassport = require('./passport-config.js');
-const { UserManagement } = require('./Managers/UserManager.js');
-const { ErrorManagement } = require('./Managers/ErrorManager.js');
-const { SchoolManagement } = require('./Managers/SchoolManager.js');
+const {
+  UserManagement
+} = require('./Managers/UserManager.js');
+const {
+  ErrorManagement
+} = require('./Managers/ErrorManager.js');
+const {
+  SchoolManagement
+} = require('./Managers/SchoolManager.js');
 initializePassport(
   passport,
   email => users.find(user => user.email === email),
@@ -68,12 +77,20 @@ let rooms = []; // all socket rooms
 
 // root route for login
 app.get("/", CheckNotAuth, (req, res) => {
-  res.render("index", { isLogin: false, err: 100 })
+  res.render("index", {
+      isLogin: false,
+      err: 100
+  })
 });
 
 // dashboard 
 app.get('/dashboard', CheckAuth, (req, res) => {
-  res.render('dashboard', { user: req.user, loggedIn: true, err: 100, meetings: pending_meetings })
+  res.render('dashboard', {
+      user: req.user,
+      loggedIn: true,
+      err: 100,
+      meetings: pending_meetings
+  })
 })
 
 app.get('/aft/login/router', CheckAuth, (req, res) => {
@@ -101,47 +118,55 @@ app.get('/admin/register', CheckAuth, (req, res) => {
 
 app.get('/share/meeting/:id', (req, res) => {
   if (req.isAuthenticated()) {
-    res.render('joinmeeting.ejs', { user: req.user, loggedIn: true, id: req.params.id });
+      res.render('joinmeeting.ejs', {
+          user: req.user,
+          loggedIn: true,
+          id: req.params.id
+      });
   } else {
-    res.render('joinmeeting.ejs', { user: false, loggedIn: false, id: false });
+      res.render('joinmeeting.ejs', {
+          user: false,
+          loggedIn: false,
+          id: false
+      });
   }
 })
 
 // post signal for login
 app.post('/admin/register/server', CheckAuth, async (req, res) => {
   try {
-    if (req.user.type != "admin") return res.redirect('/');
-    const email = req.body.email;
-    const password = req.body.password;
-    const _hashedPassword = await bcrypt.hash(password, 10);
-    const id = Date.now().toString();
-    users.push({
-      id: id,
-      email: email,
-      password: _hashedPassword,
-      f_name: req.body.f_name,
-      l_name: req.body.l_name,
-      type: "student",
-    })
-    res.redirect('/');
-    const TryUpload = async () => {
-      const data = await readFile('./db/users_secure.json', 'utf-8');
-      obj = JSON.parse(data);
-      var _users = obj.users;
-      _users.push({
-        id: id,
-        email: email,
-        password: _hashedPassword,
-        f_name: req.body.f_name,
-        l_name: req.body.l_name,
-        type: "student",
-      });
-      json = JSON.stringify(obj, 2, null);
-      await writeFile('./db/users_secure.json', json, 'utf-8');
-    }
-    TryUpload();
+      if (req.user.type != "admin") return res.redirect('/');
+      const email = req.body.email;
+      const password = req.body.password;
+      const _hashedPassword = await bcrypt.hash(password, 10);
+      const id = Date.now().toString();
+      users.push({
+          id: id,
+          email: email,
+          password: _hashedPassword,
+          f_name: req.body.f_name,
+          l_name: req.body.l_name,
+          type: "student",
+      })
+      res.redirect('/');
+      const TryUpload = async () => {
+          const data = await readFile('./db/users_secure.json', 'utf-8');
+          obj = JSON.parse(data);
+          var _users = obj.users;
+          _users.push({
+              id: id,
+              email: email,
+              password: _hashedPassword,
+              f_name: req.body.f_name,
+              l_name: req.body.l_name,
+              type: "student",
+          });
+          json = JSON.stringify(obj, 2, null);
+          await writeFile('./db/users_secure.json', json, 'utf-8');
+      }
+      TryUpload();
   } catch {
-    res.redirect('/admin/register?state=false&err=001');
+      res.redirect('/admin/register?state=false&err=001');
   }
 });
 
@@ -154,16 +179,16 @@ app.post('/create/meeting/', CheckAuth, (req, res) => {
   const meeting_key = uuidv4();
   const pwd = Math.floor(Math.random() * 90000) + 10000;
   const meeting = {
-    id: Date.now().toString(),
-    key: meeting_key,
-    hostID: req.user.id,
-    pwd: pwd,
-    topic: req.body.topic,
-    type: req.body.type,
-    desc: req.body.desc,
-    start: false,
-    max: 20,
-    users: []
+      id: Date.now().toString(),
+      key: meeting_key,
+      hostID: req.user.id,
+      pwd: pwd,
+      topic: req.body.topic,
+      type: req.body.type,
+      desc: req.body.desc,
+      start: false,
+      max: 20,
+      users: []
   }
   pending_meetings.push(meeting);
   res.send(meeting);
@@ -175,14 +200,14 @@ app.post('/meeting/start/:id', CheckAuth, (req, res) => {
   if (isOccupied(req.user.id)) return res.send('err');
   let meeting = pending_meetings.find(o => o.id == req.params.id);
   let data = {
-    meeting_id: meeting.id,
-    meeting_password: meeting.pwd
+      meeting_id: meeting.id,
+      meeting_password: meeting.pwd
   }
   res.send(data);
   started_meetings.push(meeting);
   const i = pending_meetings.indexOf(meeting);
   if (i > -1) {
-    pending_meetings.splice(i, 1);
+      pending_meetings.splice(i, 1);
   }
 })
 
@@ -199,29 +224,37 @@ app.get("/meeting/:room", CheckAuth, (req, res) => {
   let meeting = started_meetings.find(o => o.key == req.params.room);
   if (meeting == undefined) res.redirect('/')
   else {
-    if (meeting.users.includes(req.user.id)) {
-      res.render("room", { roomId: req.params.room, id_user: req.user.id, f_name: req.user.f_name, l_name: req.user.l_name, email: req.user.email });
-    } else return res.redirect('/err');
+      if (meeting.users.includes(req.user.id)) {
+          res.render("room", {
+              roomId: req.params.room,
+              id_user: req.user.id,
+              f_name: req.user.f_name,
+              l_name: req.user.l_name,
+              email: req.user.email
+          });
+      } else return res.redirect('/err');
   }
 });
 
 /*
-    Class Rooms & School
+  Class Rooms & School
 
-    This is the start of all routes 
-    which are required to get or
-    posted to for all class room
-    related actions for schools
+  This is the start of all routes 
+  which are required to get or
+  posted to for all class room
+  related actions for schools
 
 */
 
 app.get('/school/:schoolID/admin', CheckAuth, async (req, res) => {
   if (!UserManagement.isAdmin(req.user)) {
-    ErrorManagement.ThrowError.Permissions.Insufficient();
-    return res.send(500);
+      ErrorManagement.ThrowError.Permissions.Insufficient();
+      return res.send(500);
   } else {
-    const school = await SchoolManagement.GetSchool(1630507665048);
-    res.render('admin', { school: school })
+      const school = await SchoolManagement.GetSchool(1630507665048);
+      res.render('admin', {
+          school: school
+      })
   }
 })
 
@@ -233,13 +266,13 @@ app.get('/school/:schoolID/classroom', (req, res) => {
 
 /*
 
-    End of Class room routes
+  End of Class room routes
 
 */
 
 app.get('/dev', CheckAuth, (req, res) => {
   if (req.user.type === "admin")
-    res.render('dev.ejs')
+      res.render('dev.ejs')
   else res.sendStatus(100)
 })
 
@@ -248,131 +281,135 @@ io.on("connection", socket => {
   // when the event 'join-room' is triggered we are to listen to it.
   socket.on("join-room", (roomId, userPointer) => {
 
-    // joining with roomId from front-end (creating a socket room)
-    let room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
-    if (room == undefined) {
-      rooms.push({
-        id: roomId,
-        host: userPointer,
-        hostsocketID: socket.id,
-        connected: [
-          {
-            socketID: socket.id,
-            userPointer: userPointer,
-            isHost: true,
-          }
-        ],
-        tracks: []
-      })
-    } else {
-      // room exists
-      room.connected.push({
-        socketID: socket.id,
-        userPointer: userPointer,
-        isHost: false,
-      })
-      room = rooms.find(o => o.id === roomId);
-    }
-    socket.join(roomId)
-
-    console.log(`${userPointer} has joined this room ` + roomId);
-
-    // telling all others that a new user has joined 
-    room = rooms.find(o => o.id == roomId);
-    const _connectedUsers = room.connected;
-    let connectedUsers = [];
-    _connectedUsers.forEach(element => {
-      const user = users.find(o => o.id == element.userPointer);
-      connectedUsers.push({
-        id: user.id,
-        f_name: user.f_name,
-        l_name: user.l_name,
-        email: user.email,
-      })
-    });
-    room = rooms.find(o => o.id === roomId);
-    io.sockets.in(roomId).emit('sfu-user-update', room.tracks);
-    io.sockets.in(roomId).emit('connected-users-list', connectedUsers);
-    socket.to(roomId).broadcast.emit("user-connected", connectedUsers, socket.id);
-    
-    socket.on('user-mute', (remoteMedia) =>  socket.to(roomId).broadcast.emit('user-mute', remoteMedia));
-    socket.on('user-unmute', (remoteMedia) =>  socket.to(roomId).broadcast.emit('user-unmute', remoteMedia));
-
-
-    socket.on('user-videoOff', (remoteMediaID) => {
-      socket.to(roomId).broadcast.emit('user-videoOff', remoteMediaID);
-    })
-
-    socket.on('user-videoOn', (remoteMediaID) => {
-      socket.to(roomId).broadcast.emit('user-videoOn', remoteMediaID);
-    })
-
-    socket.on('message', (message, whoSentID) => {
-      const user = users.find(o => o.id == whoSentID);
-      const name = user.f_name;
-      io.to(roomId).emit('createMessage', message, name);
-    });
-
-    socket.on('reqVideoRemove', id => {
-      io.to(roomId).emit('removeVideo', id);
-    })
-
-    socket.on('reqVideoAdd', id => {
-      io.to(roomId).emit('addVideo', id);
-    })
-
-    socket.on('sfu-user-connected', (user_id, media_id, room_id) => {
-      room = rooms.find(o => o.id === room_id);
-      const media = room.tracks.find(o => o.user_id == user_id);
-      if (media == undefined) room.tracks.push({ media_id: media_id, user_id: user_id })
-      else {
-        const index = room.tracks.indexOf(media);
-        if (index > -1) room.tracks.splice(index, 1);
-        room.tracks.push({ media_id: media_id, user_id: user_id })
+      // joining with roomId from front-end (creating a socket room)
+      let room = rooms.find(o => o.id === roomId); // find if a room already exists in our rooms array
+      if (room == undefined) {
+          rooms.push({
+              id: roomId,
+              host: userPointer,
+              hostsocketID: socket.id,
+              connected: [{
+                  socketID: socket.id,
+                  userPointer: userPointer,
+                  isHost: true,
+              }],
+              tracks: []
+          })
+      } else {
+          // room exists
+          room.connected.push({
+              socketID: socket.id,
+              userPointer: userPointer,
+              isHost: false,
+          })
+          room = rooms.find(o => o.id === roomId);
       }
-      io.sockets.in(room_id).emit('sfu-user-update', room.tracks);
-    })
+      socket.join(roomId)
 
-    socket.on("disconnect", reason => {
-      room = rooms.find(o => o.id === roomId);
-      io.sockets.in(roomId).emit('sfu-user-update', room.tracks);
-      for (var i = 0; i < rooms.length; i++) {
-        for (var j = 0; j < rooms[i].connected.length; j++) {
-          if (rooms[i].connected[j].socketID == socket.id) {
-            // found disconnected user (guaranteed to be only one)
-            console.log(`${rooms[i].connected[j].userPointer} has left this room ` + rooms[i].id);
-            let meeting = started_meetings.find(o => o.key === rooms[i].id);
-            const index = meeting.users.indexOf(rooms[i].connected[j].userPointer);
-            if (index > -1) {
-              meeting.users.splice(index, 1);
-            }
-            rooms[i].connected.splice(j, 1);
-          }
-        }
-      }
-      const clients = io.sockets.adapter.rooms[`${roomId}`];
-      const numClients = clients ? clients.size : 0;
-      if (numClients <= 0) {
-        let meeting = started_meetings.find(o => o.key == roomId);
-        const index = started_meetings.indexOf(meeting);
-        if (index > -1) {
-          started_meetings.splice(index, 1);
-        }
-      }
-      room = rooms.find(o => o.id == roomId)
+      console.log(`${userPointer} has joined this room ` + roomId);
+
+      // telling all others that a new user has joined 
+      room = rooms.find(o => o.id == roomId);
       const _connectedUsers = room.connected;
       let connectedUsers = [];
       _connectedUsers.forEach(element => {
-        const user = users.find(o => o.id == element.userPointer);
-        connectedUsers.push({
-          id: user.id,
-          f_name: user.f_name,
-          l_name: user.l_name,
-          email: user.email,
-        })
+          const user = users.find(o => o.id == element.userPointer);
+          connectedUsers.push({
+              id: user.id,
+              f_name: user.f_name,
+              l_name: user.l_name,
+              email: user.email,
+          })
       });
-      io.to(roomId).emit("userDisconnected", userPointer, connectedUsers);
-    });
+      room = rooms.find(o => o.id === roomId);
+      io.sockets.in(roomId).emit('sfu-user-update', room.tracks);
+      io.sockets.in(roomId).emit('connected-users-list', connectedUsers);
+      socket.to(roomId).broadcast.emit("user-connected", connectedUsers, socket.id);
+
+      socket.on('user-mute', (remoteMedia) => socket.to(roomId).broadcast.emit('user-mute', remoteMedia));
+      socket.on('user-unmute', (remoteMedia) => socket.to(roomId).broadcast.emit('user-unmute', remoteMedia));
+
+
+      socket.on('user-videoOff', (remoteMediaID) => {
+          socket.to(roomId).broadcast.emit('user-videoOff', remoteMediaID);
+      })
+
+      socket.on('user-videoOn', (remoteMediaID) => {
+          socket.to(roomId).broadcast.emit('user-videoOn', remoteMediaID);
+      })
+
+      socket.on('message', (message, whoSentID) => {
+          const user = users.find(o => o.id == whoSentID);
+          const name = user.f_name;
+          io.to(roomId).emit('createMessage', message, name);
+      });
+
+      socket.on('reqVideoRemove', id => {
+          io.to(roomId).emit('removeVideo', id);
+      })
+
+      socket.on('reqVideoAdd', id => {
+          io.to(roomId).emit('addVideo', id);
+      })
+
+      socket.on('sfu-user-connected', (user_id, media_id, room_id) => {
+          room = rooms.find(o => o.id === room_id);
+          const media = room.tracks.find(o => o.user_id == user_id);
+          if (media == undefined) room.tracks.push({
+              media_id: media_id,
+              user_id: user_id
+          })
+          else {
+              const index = room.tracks.indexOf(media);
+              if (index > -1) room.tracks.splice(index, 1);
+              room.tracks.push({
+                  media_id: media_id,
+                  user_id: user_id
+              })
+          }
+          io.sockets.in(room_id).emit('sfu-user-update', room.tracks);
+      })
+
+      socket.on("disconnect", reason => {
+          room = rooms.find(o => o.id === roomId);
+          io.sockets.in(roomId).emit('sfu-user-update', room.tracks);
+          for (var i = 0; i < rooms.length; i++) {
+              for (var j = 0; j < rooms[i].connected.length; j++) {
+                  if (rooms[i].connected[j].socketID == socket.id) {
+                      // found disconnected user (guaranteed to be only one)
+                      console.log(`${rooms[i].connected[j].userPointer} has left this room ` + rooms[i].id);
+                      let meeting = started_meetings.find(o => o.key === rooms[i].id);
+                      const index = meeting.users.indexOf(rooms[i].connected[j].userPointer);
+                      if (index > -1) {
+                          meeting.users.splice(index, 1);
+                      }
+                      rooms[i].connected.splice(j, 1);
+                  }
+              }
+          }
+          const clients = io.sockets.adapter.rooms[`${roomId}`];
+          const numClients = clients ? clients.size : 0;
+          if (numClients <= 0) {
+              let meeting = started_meetings.find(o => o.key == roomId);
+              const index = started_meetings.indexOf(meeting);
+              if (index > -1) {
+                  started_meetings.splice(index, 1);
+              }
+          }
+          room = rooms.find(o => o.id == roomId)
+          const _connectedUsers = room.connected;
+          let connectedUsers = [];
+          _connectedUsers.forEach(element => {
+              const user = users.find(o => o.id == element.userPointer);
+              connectedUsers.push({
+                  id: user.id,
+                  f_name: user.f_name,
+                  l_name: user.l_name,
+                  email: user.email,
+              })
+          });
+          io.to(roomId).emit("userDisconnected", userPointer, connectedUsers);
+      });
   });
 
 });
@@ -382,15 +419,15 @@ io.on("connection", socket => {
 
 function CheckAuth(req, res, next) {
   if (req.isAuthenticated()) {
-    return next();
+      return next();
   } else {
-    res.redirect('/');
+      res.redirect('/');
   }
 }
 
 function CheckNotAuth(req, res, next) {
   if (req.isAuthenticated()) {
-    return res.redirect('/dashboard');
+      return res.redirect('/dashboard');
   }
   next();
 }
@@ -400,13 +437,13 @@ async function LoadUsers() {
   obj = JSON.parse(data);
   if (!obj) return;
   for (var i = 0; i < obj.users.length; i++) {
-    users.push(obj.users[i]);
+      users.push(obj.users[i]);
   }
 }
 
 LoadUsers();
 
-const UpdateUsers = setInterval(async function () {
+const UpdateUsers = setInterval(async function() {
   const data = await readFile('./db/users_secure.json', 'utf-8');
   obj = JSON.parse(data);
   users = obj.users;
@@ -414,14 +451,14 @@ const UpdateUsers = setInterval(async function () {
 
 function isOccupied(userPointer) {
   for (var i = 0; i < pending_meetings.length; i++) {
-    if (pending_meetings[i].users.includes(userPointer)) {
-      return true;
-    }
+      if (pending_meetings[i].users.includes(userPointer)) {
+          return true;
+      }
   }
   for (var i = 0; i < started_meetings.length; i++) {
-    if (started_meetings[i].users.includes(userPointer)) {
-      return true;
-    }
+      if (started_meetings[i].users.includes(userPointer)) {
+          return true;
+      }
   }
   return false;
 }

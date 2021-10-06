@@ -34,7 +34,8 @@ async function init() {
             connectedToAudio = true;
             if (i < tasks.length) {
                 PerformAllTasks();
-            } cameraState = true;
+            }
+            cameraState = true;
             webCamStatus = true;
         } else {
             alert("No web cam was detected..\n\nProceed to connect with only audio?");
@@ -43,7 +44,8 @@ async function init() {
             connectedToAudio = true;
             if (i < tasks.length) {
                 PerformAllTasks();
-            } webCamStatus = false;
+            }
+            webCamStatus = false;
             $("#can-state").css('color', 'yellow');
         }
         successInit = true;
@@ -82,6 +84,7 @@ signalLocal.onopen = async () => {
 }
 
 var i = 0;
+
 function PerformAllTasks() {
     setTimeout(function () {
         tasks[i].performTask(tasks[i].track, tasks[i].stream);
@@ -114,6 +117,12 @@ clientLocal.ontrack = (track, stream) => {
             let wrapper = document.createElement("div")
             wrapper.id = track.id; // track id
             wrapper.classList.add("box-container")
+            wrapper.innerHTML += `<div class="info-user">
+            <p class="username" data-id="${stream.id}">${F_NAME} ${L_NAME}</p>
+            <p class="detail">XXXX/XXXX</p>
+            <p class="detail">${MY_EMAIL}</p>
+            <p class="detail">+91 XXX XXXX XXX</p>
+            </div> `
             wrapper.append(videoEl)
             videoGrid.append(wrapper);
             wrapper.setAttribute("data-stream-id", stream.id)
@@ -169,7 +178,14 @@ clientLocal.ontrack = (track, stream) => {
                     let wrapper = document.createElement("div")
                     wrapper.id = track.id; // track id
                     wrapper.classList.add("box-container")
-                    wrapper.append(videoEl)
+                    wrapper.innerHTML += `<div class="info-user">
+                    <p class="username" data-id="${stream.id}">${F_NAME} ${L_NAME}</p>
+                    <p class="detail">XXXX/XXXX</p>
+                    <p class="detail">${MY_EMAIL}</p>
+                    <p class="detail">+91 XXX XXXX XXX</p>
+                    </div> `
+                    wrapper.append(videoEl);
+
                     videoGrid.append(wrapper);
                     wrapper.setAttribute("data-stream-id", stream.id)
 
@@ -241,7 +257,7 @@ const PublishVideo = (media, videoEl) => {
         <p class="detail">XXXX/XXXX</p>
         <p class="detail">${MY_EMAIL}</p>
         <p class="detail">+91 XXX XXXX XXX</p>
-    </div> `
+        </div> `
         wrapper.id = null;
         wrapper.append(videoEl)
         videoGrid.append(wrapper);
@@ -261,7 +277,9 @@ const PublishVideo = (media, videoEl) => {
 const PublishAudio = (media) => {
     RemoveNullElements();
     setTimeout(function () {
-        CreateElement.CreateAudioBlock({ id: null }, media, true);
+        CreateElement.CreateAudioBlock({
+            id: null
+        }, media, true);
     }, 500);
 }
 
@@ -285,12 +303,16 @@ function ToggleMute() {
         });
         socket.emit('user-unmute', remoteMedia.id);
         $("#muted-state").css('color', 'green');
+        const user = document.querySelector(`div[id='null']`)
+        user.classList.remove('muted');
         muted = false;
     } else {
         remoteMedia.getAudioTracks().forEach(element => {
             element.enabled = false;
         });
         socket.emit('user-mute', remoteMedia.id);
+        const user = document.querySelector(`div[id='null']`)
+        user.classList.add('muted');
         $("#muted-state").css('color', 'red');
         muted = true;
     }
