@@ -120,7 +120,7 @@ document.onmousemove = function(event) {
 	pointerX = event.pageX;
 	pointerY = event.pageY;
 }
-setInterval(pointerCheck, 500);
+setInterval(pointerCheck, 100);
 function pointerCheck() {
 	if((pointerX == lastX && pointerY == lastY)) return;
   else{
@@ -136,7 +136,6 @@ function pointerCheck() {
         sidepanel.setAttribute('class', 'slide-out');
         isPanelVisible = false;
       }
-      
     }
   }
 }

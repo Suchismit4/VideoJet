@@ -1,51 +1,54 @@
-// REMINDER: TODO Fix meeting check method to check if a meeting is valid but not started. Implement waiting room.
-// TODO: Fix idk what is broken socket emits to sender.
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
-// imports
+
+/*
+  ---- EXPRESS ----
+  We are using Express framework for running our 
+  web application and then starting an http server with it
+*/
 const express = require("express");
 const app = express();
-const bodyParser = require("body-parser");
+const routes = require('./src/routes/router.js');
 const server = require("http").Server(app);
+
+/*  
+  ---- WEBSOCKETS ----
+  We are using socket.io to run websockets
+  between peers in our application. 
+*/
 const io = require("socket.io")(server);
+
+/*
+  ---- Misc. dependency imports followed -----
+*/
+const bodyParser = require("body-parser");
 const fs = require('fs');
-const {
-  v4: uuidv4
-} = require("uuid");
-const utils = require('./utils.js')
-const ClassManager = require('./Managers/ClassManager.js')
 const {
   ExpressPeerServer
 } = require("peer");
 
-// importing essentials for login system
-const bcrypt = require('bcrypt');
+
+/*
+  ---- Initializing PASSPORT and FLASH ---- 
+*/
 const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session') // express session import
 const {
   promisify
 } = require('util')
-const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 const initializePassport = require('./passport-config.js');
-const {
-  UserManagement
-} = require('./Managers/UserManager.js');
-const {
-  ErrorManagement
-} = require('./Managers/ErrorManager.js');
-const {
-  SchoolManagement
-} = require('./Managers/SchoolManager.js');
 initializePassport(
   passport,
   email => users.find(user => user.email === email),
   id => users.find(user => user.id === id)
 );
 
-// settings
+/*
+  ---- APP USAGE ----
+*/
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({
   extended: false
@@ -58,7 +61,6 @@ const peerServer = ExpressPeerServer(server, {
 app.use(express.urlencoded({
   extended: false
 }))
-
 app.use(flash())
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -69,214 +71,18 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(express.json());
 app.use('/peerjs', peerServer);
+app.use('/', routes);
 
-let pending_meetings = [];
-let started_meetings = [];
+/**
+ * <<------- SOURCE ------->> 
+ */
+
+let pending_meetings = require('./src/container/meetings').pending_meetings;
+let started_meetings = require('./src/container/meetings').started_meetings;
 var users = [];
 let rooms = []; // all socket rooms
 
-// root route for login
-app.get("/", CheckNotAuth, (req, res) => {
-  res.render("index", {
-      isLogin: false,
-      err: 100
-  })
-});
 
-// dashboard 
-app.get('/dashboard', CheckAuth, (req, res) => {
-  res.render('dashboard', {
-      user: req.user,
-      loggedIn: true,
-      err: 100,
-      meetings: pending_meetings
-  })
-})
-
-app.get('/aft/login/router', CheckAuth, (req, res) => {
-  if (UserManagement.isAdmin(req.user)) return res.redirect(`/school/${req.user.schoolID}/admin`);
-  else return res.redirect('/dashboard');
-})
-
-app.post('/user/login', CheckNotAuth, passport.authenticate('local', {
-  successRedirect: '/aft/login/router',
-  failureRedirect: '/',
-  failureFlash: true
-}));
-
-//get request to handle new class creation for teacher
-app.get('/teacher/create-meeting', CheckAuth, (req, res) => {
-  if (req.user.type == "student") return res.redirect('/');
-  res.render('create-meeting.ejs')
-});
-
-// get request to handle displaying register
-app.get('/admin/register', CheckAuth, (req, res) => {
-  if (req.user.type != "admin") return res.redirect('/');
-  res.render('register');
-});
-
-app.get('/share/meeting/:id', (req, res) => {
-  if (req.isAuthenticated()) {
-      res.render('joinmeeting.ejs', {
-          user: req.user,
-          loggedIn: true,
-          id: req.params.id
-      });
-  } else {
-      res.render('joinmeeting.ejs', {
-          user: false,
-          loggedIn: false,
-          id: false
-      });
-  }
-})
-
-// post signal for login
-app.post('/admin/register/server', CheckAuth, async (req, res) => {
-  try {
-      if (req.user.type != "admin") return res.redirect('/');
-      const email = req.body.email;
-      const password = req.body.password;
-      const _hashedPassword = await bcrypt.hash(password, 10);
-      const id = Date.now().toString();
-      users.push({
-          id: id,
-          email: email,
-          password: _hashedPassword,
-          f_name: req.body.f_name,
-          l_name: req.body.l_name,
-          type: "student",
-      })
-      res.redirect('/');
-      const TryUpload = async () => {
-          const data = await readFile('./db/users_secure.json', 'utf-8');
-          obj = JSON.parse(data);
-          var _users = obj.users;
-          _users.push({
-              id: id,
-              email: email,
-              password: _hashedPassword,
-              f_name: req.body.f_name,
-              l_name: req.body.l_name,
-              type: "student",
-          });
-          json = JSON.stringify(obj, 2, null);
-          await writeFile('./db/users_secure.json', json, 'utf-8');
-      }
-      TryUpload();
-  } catch {
-      res.redirect('/admin/register?state=false&err=001');
-  }
-});
-
-app.get('/post-meeting', (req, res) => {
-  res.render('post-meeting.ejs')
-})
-
-// create a meeting
-app.post('/create/meeting/', CheckAuth, (req, res) => {
-  const meeting_key = uuidv4();
-  const pwd = Math.floor(Math.random() * 90000) + 10000;
-  const meeting = {
-      id: Date.now().toString(),
-      key: meeting_key,
-      hostID: req.user.id,
-      pwd: pwd,
-      topic: req.body.topic,
-      type: req.body.type,
-      desc: req.body.desc,
-      start: false,
-      max: 20,
-      users: []
-  }
-  pending_meetings.push(meeting);
-  res.send(meeting);
-});
-
-app.get('/err', (req, res) => res.render('err'));
-
-app.post('/meeting/start/:id', CheckAuth, (req, res) => {
-  if (isOccupied(req.user.id)) return res.send('err');
-  let meeting = pending_meetings.find(o => o.id == req.params.id);
-  let data = {
-      meeting_id: meeting.id,
-      meeting_password: meeting.pwd
-  }
-  res.send(data);
-  started_meetings.push(meeting);
-  const i = pending_meetings.indexOf(meeting);
-  if (i > -1) {
-      pending_meetings.splice(i, 1);
-  }
-})
-
-app.post('/join/meeting', CheckAuth, (req, res) => {
-  if (isOccupied(req.user.id)) return res.send('err');
-  let meeting = started_meetings.find(o => o.id == req.body.id);
-  if (meeting == undefined || meeting.pwd != req.body.pwd) return res.send('err');;
-  meeting.users.push(req.user.id);
-  res.send(`/meeting/${meeting.key}`);
-})
-
-// getting the uuid room route
-app.get("/meeting/:room", CheckAuth, (req, res) => {
-  let meeting = started_meetings.find(o => o.key == req.params.room);
-  if (meeting == undefined) res.redirect('/')
-  else {
-      if (meeting.users.includes(req.user.id)) {
-          res.render("room", {
-              roomId: req.params.room,
-              id_user: req.user.id,
-              f_name: req.user.f_name,
-              l_name: req.user.l_name,
-              email: req.user.email
-          });
-      } else return res.redirect('/err');
-  }
-});
-
-/*
-  Class Rooms & School
-
-  This is the start of all routes 
-  which are required to get or
-  posted to for all class room
-  related actions for schools
-
-*/
-
-app.get('/school/:schoolID/admin', CheckAuth, async (req, res) => {
-  if (!UserManagement.isAdmin(req.user)) {
-      ErrorManagement.ThrowError.Permissions.Insufficient();
-      return res.send(500);
-  } else {
-      const school = await SchoolManagement.GetSchool(1630507665048);
-      res.render('admin', {
-          school: school
-      })
-  }
-})
-
-
-app.get('/school/:schoolID/classroom', (req, res) => {
-
-})
-
-
-/*
-
-  End of Class room routes
-
-*/
-
-app.get('/dev', CheckAuth, (req, res) => {
-  if (req.user.type === "admin")
-      res.render('dev.ejs')
-  else res.sendStatus(100)
-})
-
-// when a new user connects to our network
 io.on("connection", socket => {
   // when the event 'join-room' is triggered we are to listen to it.
   socket.on("join-room", (roomId, userPointer) => {
@@ -415,23 +221,6 @@ io.on("connection", socket => {
 });
 
 
-// Authentication Middleware functions
-
-function CheckAuth(req, res, next) {
-  if (req.isAuthenticated()) {
-      return next();
-  } else {
-      res.redirect('/');
-  }
-}
-
-function CheckNotAuth(req, res, next) {
-  if (req.isAuthenticated()) {
-      return res.redirect('/dashboard');
-  }
-  next();
-}
-
 async function LoadUsers() {
   const data = await readFile('./db/users_secure.json', 'utf-8');
   obj = JSON.parse(data);
@@ -449,21 +238,6 @@ const UpdateUsers = setInterval(async function() {
   users = obj.users;
 }, 25000);
 
-function isOccupied(userPointer) {
-  for (var i = 0; i < pending_meetings.length; i++) {
-      if (pending_meetings[i].users.includes(userPointer)) {
-          return true;
-      }
-  }
-  for (var i = 0; i < started_meetings.length; i++) {
-      if (started_meetings[i].users.includes(userPointer)) {
-          return true;
-      }
-  }
-  return false;
-}
 
 server.listen(process.env.PORT || 3030)
 console.log("Server now running on http://localhost:3030")
-
-// TODO: handle tracks on disconnect
