@@ -27,12 +27,16 @@ let pending_meetings = require('../container/meetings').pending_meetings;
 let started_meetings = require('../container/meetings').started_meetings;
 
 // root route for login
-routes.get("/", Middleware.CheckNotAuth, (req, res) => {
-    res.render("index", {
+routes.get("/login", Middleware.CheckNotAuth, (req, res) => {
+    res.render("login", {
         isLogin: false,
         err: 100
     })
 });
+
+routes.get('/', (req, res) => {
+    res.render('index')
+})
 
 // dashboard 
 routes.get('/dashboard', Middleware.CheckAuth, (req, res) => {
@@ -51,7 +55,7 @@ routes.get('/aft/login/router', Middleware.CheckAuth, (req, res) => {
 
 routes.post('/user/login', Middleware.CheckNotAuth, passport.authenticate('local', {
     successRedirect: '/aft/login/router',
-    failureRedirect: '/',
+    failureRedirect: '/login',
     failureFlash: true
 }));
 

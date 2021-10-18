@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Clone | Made by Aten & Ribu</title>
+    <script src="https://kit.fontawesome.com/1d62c0dc9b.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="/main/style.css">
+    <script>
+        LOGIN_STATE = <%= isLogin %>;
+        ERR_STATE = <%= err %>;
+        if (ERR_STATE == 500) {
+            alert("Something went wrong.")
+        }
+
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div>
+                    <img id="logo" src="/img/logo.png" alt="">
+                </div>
+            </div>
+        </div>
+    </header>
+    <div id="login-area">
+        <div class="container">
+            <div class="row justify-content-center">
+                <form action="/user/login" method="POST">
+                    <div class="row">
+                        <p id="tag-form">Login to your account...</p>
+                    </div>
+                    <div class="row">
+                        <input type="email" placeholder="Your registered email address" name="email" id="email">
+                    </div>
+                    <div class="row">
+                        <input type="password" placeholder="Your password" name="password" id="password">
+                    </div>
+                    <div class="row">
+                        <button type="submit">Go &nbsp;<i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script src="/main/main.js"></script>
+
+</html>
