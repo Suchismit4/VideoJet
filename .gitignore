@@ -1,3 +1,4 @@
 node_modules/
 db/users_secure.json
 .idea/
+db/users.json
